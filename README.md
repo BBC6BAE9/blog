@@ -1,4 +1,4 @@
-# Hong 的技术笔记
+# BBC6BAE9‘s Blog
 
 基于 [Monograph](https://github.com/xocothemes/monograph) 的中文个人技术博客，使用 Astro 生成静态页面，通过 GitHub Actions 发布到 GitHub Pages。无需自建服务器，也不依赖 Cloudflare。
 
