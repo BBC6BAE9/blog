@@ -3,7 +3,7 @@ title: "Bringing Traditional Streaming to visionOS: A Playback Pipeline for 3D, 
 excerpt: "How a client-side HLS server, APMP metadata, and MV-HEVC bring existing stereo and panoramic streams into Vision Pro’s native player."
 category: "Apple 平台"
 language: "en"
-date: 2026-09-16
+date: 2026-07-19
 author:
   name: "Hong Huang"
   role: "Developer"
