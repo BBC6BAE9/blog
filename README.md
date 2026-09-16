@@ -2,9 +2,9 @@
 
 基于 [Monograph](https://github.com/xocothemes/monograph) 的中文个人技术博客，使用 Astro 生成静态页面，通过 GitHub Actions 发布到 GitHub Pages。Cloudflare 管理自定义域名的 DNS，网站内容由 GitHub Pages 提供，无需自建服务器。
 
-- 博客：[hong.foomansoft.com](https://hong.foomansoft.com/)
+- 博客：[honghuang.foomansoft.com](https://honghuang.foomansoft.com/)
 - 源码：[BBC6BAE9/blog](https://github.com/BBC6BAE9/blog)
-- RSS：[订阅最新文章](https://hong.foomansoft.com/rss.xml)
+- RSS：[订阅最新文章](https://honghuang.foomansoft.com/rss.xml)
 - 原来的[个人主页](https://bbc6bae9.github.io/zh/)继续独立保留。
 
 ## 本地运行
@@ -73,9 +73,9 @@ git push origin main
 | `src/pages/privacy.astro`  | 隐私说明                                     |
 | `src/styles/global.css`    | 字体、颜色与阅读样式                         |
 
-站点使用自定义域名 `hong.foomansoft.com` 的根路径 `/`。`src/config/site.ts` 的 `siteUrl` 为 `https://hong.foomansoft.com/`，`astro.config.mjs` 的 `base` 为 `/`。组件中的站内链接使用 `withBase()`；Markdown 正文中的站内链接从根路径开始，例如 `/post/swiftui-notes/`、`/media/example.png`，不再添加 `/blog/`。
+站点使用自定义域名 `honghuang.foomansoft.com` 的根路径 `/`。`src/config/site.ts` 的 `siteUrl` 为 `https://honghuang.foomansoft.com/`，`astro.config.mjs` 的 `base` 为 `/`。组件中的站内链接使用 `withBase()`；Markdown 正文中的站内链接从根路径开始，例如 `/post/swiftui-notes/`、`/media/example.png`，不再添加 `/blog/`。
 
-GitHub 仓库 Pages 设置中的 Custom domain 应为 `hong.foomansoft.com`；Cloudflare DNS 添加名称为 `hong`、目标为 `bbc6bae9.github.io` 的 CNAME 记录，代理状态使用“仅 DNS”。此仓库通过 GitHub Actions 部署，域名以 Pages 设置为准，不依赖仓库里的 CNAME 文件。GitHub 签发证书后启用 Enforce HTTPS。
+GitHub 仓库 Pages 设置中的 Custom domain 应为 `honghuang.foomansoft.com`；Cloudflare DNS 添加名称为 `honghuang`、目标为 `bbc6bae9.github.io` 的 CNAME 记录，代理状态使用“仅 DNS”。此仓库通过 GitHub Actions 部署，域名以 Pages 设置为准，不依赖仓库里的 CNAME 文件。GitHub 签发证书后启用 Enforce HTTPS。
 
 文章的公开地址与长期标识分别维护。`src/lib/posts.ts` 的 `postIdentity()` 保留最初的 `blog/post/<slug>/` 命名空间，用于 giscus 评论匹配和 RSS GUID。以后更换域名或路径也不要改变这个标识；已有文章的目录名同样应保持稳定。RSS 的文章链接使用当前域名，GUID 则保留原 GitHub Pages URL 字符串。
 
