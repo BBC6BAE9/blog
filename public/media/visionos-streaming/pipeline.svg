@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1010" viewBox="0 0 960 1010" role="img" aria-labelledby="pipeline-title pipeline-description">
+  <title id="pipeline-title">From streaming sources to spatial playback</title>
+  <desc id="pipeline-description">Read source platform media metadata and candidate CDN URLs. Select the video rendition, audio track, and spatial configuration. Read initialization data and media segments using the index, then choose an adaptation path. Monoscopic panorama adds projection declarations. Planar stereo splits the left and right views and outputs tagged frames. Stereoscopic panorama uses either stereo composition or MV-HEVC and HLS delivery. All three paths converge on system identification of media capabilities, followed by the AVKit system player and available viewing experiences.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L8 5 L1 9" fill="none" stroke="#596579" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      .node { fill: #ffffff; stroke: #cbd2de; stroke-width: 1.5; }
+      .decision { fill: #eaf1ff; stroke: #83a3dc; stroke-width: 1.5; }
+      .branch { fill: #f5f7fb; stroke: #cbd2de; stroke-width: 1.5; }
+      .final { fill: #edf6f2; stroke: #95bdac; stroke-width: 1.5; }
+      .label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; font-size: 23px; font-weight: 500; fill: #182334; text-anchor: middle; }
+      .branch-title { font-size: 23px; font-weight: 650; }
+      .branch-detail { font-size: 22px; font-weight: 400; fill: #344256; }
+      .connector { fill: none; stroke: #596579; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+    </style>
+  </defs>
+  <rect width="960" height="1010" rx="20" fill="#fcfcfe"/>
+
+  <!-- A → B → C → D -->
+  <g class="connector" marker-end="url(#arrow)">
+    <path d="M480 104 V144"/>
+    <path d="M480 232 V272"/>
+    <path d="M480 360 V400"/>
+  </g>
+
+  <g id="source">
+    <rect class="node" x="200" y="32" width="560" height="72" rx="14"/>
+    <text class="label" x="480" y="62">
+      <tspan x="480">Source platform media metadata</tspan>
+      <tspan x="480" dy="29">and candidate CDN URLs</tspan>
+    </text>
+  </g>
+  <g id="selection">
+    <rect class="node" x="200" y="144" width="560" height="88" rx="14"/>
+    <text class="label" x="480" y="181">
+      <tspan x="480">Select video rendition, audio track,</tspan>
+      <tspan x="480" dy="29">and spatial configuration</tspan>
+    </text>
+  </g>
+  <g id="indexed-read">
+    <rect class="node" x="200" y="272" width="560" height="88" rx="14"/>
+    <text class="label" x="480" y="309">
+      <tspan x="480">Read initialization data and media</tspan>
+      <tspan x="480" dy="29">segments using the index</tspan>
+    </text>
+  </g>
+  <g id="adaptation-path">
+    <rect class="decision" x="250" y="400" width="460" height="72" rx="14"/>
+    <text class="label" x="480" y="445">Choose an adaptation path</text>
+  </g>
+
+  <!-- D branches independently into E, F, and G. -->
+  <g class="connector">
+    <path d="M480 472 V505 H168 V538" marker-end="url(#arrow)"/>
+    <path d="M480 505 V538" marker-end="url(#arrow)"/>
+    <path d="M480 505 H792 V538" marker-end="url(#arrow)"/>
+  </g>
+
+  <g id="monoscopic-panorama">
+    <rect class="branch" x="24" y="538" width="288" height="172" rx="14"/>
+    <text class="label branch-title" x="168" y="580">Monoscopic panorama</text>
+    <text class="label branch-detail" x="168" y="625">
+      <tspan x="168">Add projection</tspan>
+      <tspan x="168" dy="29">declarations</tspan>
+    </text>
+  </g>
+  <g id="planar-stereo">
+    <rect class="branch" x="336" y="538" width="288" height="172" rx="14"/>
+    <text class="label branch-title" x="480" y="580">Planar stereo</text>
+    <text class="label branch-detail" x="480" y="625">
+      <tspan x="480">Split left and right views</tspan>
+      <tspan x="480" dy="29">and output tagged frames</tspan>
+    </text>
+  </g>
+  <g id="stereoscopic-panorama">
+    <rect class="branch" x="648" y="538" width="288" height="172" rx="14"/>
+    <text class="label branch-title" x="792" y="580">Stereoscopic panorama</text>
+    <text class="label branch-detail" x="792" y="618">
+      <tspan x="792">Use stereo composition</tspan>
+      <tspan x="792" dy="29">or deliver via</tspan>
+      <tspan x="792" dy="29">MV-HEVC / HLS</tspan>
+    </text>
+  </g>
+
+  <!-- E, F, and G converge at H, followed by I. -->
+  <g class="connector">
+    <path d="M168 710 V750 H480"/>
+    <path d="M792 710 V750 H480"/>
+    <path d="M480 710 V788" marker-end="url(#arrow)"/>
+    <path d="M480 860 V900" marker-end="url(#arrow)"/>
+  </g>
+  <g id="system-capabilities">
+    <rect class="node" x="200" y="788" width="560" height="72" rx="14"/>
+    <text class="label" x="480" y="833">System identifies media capabilities</text>
+  </g>
+  <g id="system-player">
+    <rect class="final" x="200" y="900" width="560" height="72" rx="14"/>
+    <text class="label" x="480" y="930">
+      <tspan x="480">AVKit system player</tspan>
+      <tspan x="480" dy="29">and available viewing experiences</tspan>
+    </text>
+  </g>
+</svg>
