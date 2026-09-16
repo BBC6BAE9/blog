@@ -23,7 +23,7 @@ Our eyes observe a scene from slightly different positions. The resulting differ
 
 Moving your viewpoint offers a useful intuition: nearby objects usually shift more in the image than distant ones. In an ideal parallel stereo camera model, disparity increases with focal length and the distance between the cameras, and decreases with distance to the subject.
 
-![A diagram of two eyes viewing the same object from different positions](/blog/media/stereo-imaging/eye.gif)
+![A diagram of two eyes viewing the same object from different positions](/media/stereo-imaging/eye.gif)
 
 With an existing 2D image, we do not have the second camera's view. Instead, we estimate depth and use that estimate to synthesize a change in viewpoint. This can produce stereo depth cues, but it does not recover a complete 3D scene that can be viewed from arbitrary positions.
 
@@ -86,7 +86,7 @@ In the graph shown in the experiment notes, `LeftTexture` and `RightTexture` fee
 For readers using a 2D screen, the original experiment included a GIF that alternates between the left and right images. The animation below preserves that demonstration.
 
 <figure>
-  <img src="/blog/media/stereo-imaging/parallax.gif" width="3354" height="1392" loading="lazy" decoding="async" alt="Animation alternating between the synthesized left-eye and right-eye images to reveal their disparity" />
+  <img src="/media/stereo-imaging/parallax.gif" width="3354" height="1392" loading="lazy" decoding="async" alt="Animation alternating between the synthesized left-eye and right-eye images to reveal their disparity" />
   <figcaption>Alternating stereo views make their differences visible on a 2D screen. This is not a benchmark of video conversion or a substitute for binocular viewing in a headset.</figcaption>
 </figure>
 

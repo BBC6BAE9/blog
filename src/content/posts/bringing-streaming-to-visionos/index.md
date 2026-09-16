@@ -13,16 +13,16 @@ draft: false
 
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1.5rem;margin:2rem 0;">
   <figure style="margin:0;">
-    <video controls playsinline muted preload="metadata" poster="/blog/media/visionos-streaming/before-poster.jpg" width="1280" height="640" aria-label="Before: original stereo video, 13 seconds" style="display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#111;border-radius:12px;">
-      <source src="/blog/media/visionos-streaming/before-13s.mp4" type="video/mp4">
-      <a href="/blog/media/visionos-streaming/before-13s.mp4">Download the original stereo video.</a>
+    <video controls playsinline muted preload="metadata" poster="/media/visionos-streaming/before-poster.jpg" width="1280" height="640" aria-label="Before: original stereo video, 13 seconds" style="display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#111;border-radius:12px;">
+      <source src="/media/visionos-streaming/before-13s.mp4" type="video/mp4">
+      <a href="/media/visionos-streaming/before-13s.mp4">Download the original stereo video.</a>
     </video>
     <figcaption><strong>Before</strong> — Original stereo layout · 13 seconds</figcaption>
   </figure>
   <figure style="margin:0;">
-    <video controls playsinline muted preload="metadata" poster="/blog/media/visionos-streaming/after-poster.jpg" width="1280" height="720" aria-label="After: playback on Vision Pro, 13 seconds" style="display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#111;border-radius:12px;">
-      <source src="/blog/media/visionos-streaming/after-13s.mp4" type="video/mp4">
-      <a href="/blog/media/visionos-streaming/after-13s.mp4">Download the Vision Pro playback video.</a>
+    <video controls playsinline muted preload="metadata" poster="/media/visionos-streaming/after-poster.jpg" width="1280" height="720" aria-label="After: playback on Vision Pro, 13 seconds" style="display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#111;border-radius:12px;">
+      <source src="/media/visionos-streaming/after-13s.mp4" type="video/mp4">
+      <a href="/media/visionos-streaming/after-13s.mp4">Download the Vision Pro playback video.</a>
     </video>
     <figcaption><strong>After</strong> — Playback on Vision Pro · 13 seconds</figcaption>
   </figure>
@@ -139,9 +139,9 @@ This model gave the rest of the work a stable foundation. Changing quality chang
 
 At a high level, the pipeline looks like this:
 
-![Playback pipeline: source media and CDN candidates pass through selection and indexed reads, branch into three adaptation paths, and converge on system capability recognition and the AVKit player.](/blog/media/visionos-streaming/pipeline.svg)
+![Playback pipeline: source media and CDN candidates pass through selection and indexed reads, branch into three adaptation paths, and converge on system capability recognition and the AVKit player.](/media/visionos-streaming/pipeline.svg)
 
-[Open the full-size pipeline diagram](/blog/media/visionos-streaming/pipeline.svg)
+[Open the full-size pipeline diagram](/media/visionos-streaming/pipeline.svg)
 
 **Before moving into rendering, I first addressed where the video would come from and how to read it on demand.**
 

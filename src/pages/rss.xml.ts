@@ -1,6 +1,6 @@
 import { getCollection } from "astro:content";
 import { siteConfig } from "@/config/site";
-import { postHref, visiblePosts } from "@/lib/posts";
+import { postHref, postIdentity, visiblePosts } from "@/lib/posts";
 
 const escapeXml = (value: string) =>
   value
@@ -15,10 +15,12 @@ export async function GET() {
   const items = posts
     .map((post) => {
       const url = new URL(postHref(post), siteConfig.siteUrl).toString();
+      // Keep the original item ID so a domain change does not republish old posts.
+      const guid = new URL(postIdentity(post), "https://bbc6bae9.github.io/").toString();
       return `<item>
   <title>${escapeXml(post.data.title)}</title>
   <link>${url}</link>
-  <guid>${url}</guid>
+  <guid isPermaLink="false">${escapeXml(guid)}</guid>
   <pubDate>${post.data.date.toUTCString()}</pubDate>
   <description>${escapeXml(post.data.excerpt)}</description>
 </item>`;

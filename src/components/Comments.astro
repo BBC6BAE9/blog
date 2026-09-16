@@ -1,6 +1,9 @@
 ---
 import { siteConfig } from "@/config/site";
-const comments = siteConfig.comments;
+interface Props {
+  discussionTerm: string;
+}
+const comments = { ...siteConfig.comments, term: Astro.props.discussionTerm };
 ---
 {comments.enabled && (
   <section id="comments" class="canvas mt-16 border-t border-border pt-8" aria-labelledby="comments-heading">
@@ -27,7 +30,8 @@ const comments = siteConfig.comments;
       "data-repo-id": config.repoId,
       "data-category": config.category,
       "data-category-id": config.categoryId,
-      "data-mapping": "pathname",
+      "data-mapping": "specific",
+      "data-term": config.term,
       "data-strict": "1",
       "data-reactions-enabled": "1",
       "data-emit-metadata": "0",
