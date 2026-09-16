@@ -72,6 +72,7 @@ const structuredData = {
   "@context": "https://schema.org",
   "@type": "Article",
   headline: data.title,
+  inLanguage: data.language ?? siteConfig.language,
   description: data.excerpt,
   image: socialImage,
   datePublished: data.date.toISOString(),
@@ -91,7 +92,7 @@ const structuredData = {
 >
   <SiteHeader posts={allPosts} />
   <main id="content" class="outer">
-    <article>
+    <article lang={data.language ?? siteConfig.language}>
       <header class="canvas pt-10 md:pt-14">
         <p class="meta post-meta">
           <span class="post-meta__byline">
