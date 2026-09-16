@@ -9,6 +9,7 @@ const posts = defineCollection({
     z.object({
       title: z.string(),
       excerpt: z.string(),
+      language: z.enum(["zh-CN", "en"]).optional(),
       /** Must match one of the entries in src/config/categories.ts. */
       category: z.enum(categories),
       date: z.coerce.date(),
