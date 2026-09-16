@@ -1,7 +1,7 @@
 export const siteConfig = {
-  name: "Hong",
+  name: "HONG HUANG",
   tagline: "关于 Apple 平台、AI 与软件工程的记录",
-  title: "Hong",
+  title: "HONG HUANG",
   description: "Hong Huang 的个人技术博客，记录 Swift、SwiftUI、生成式 UI、播放器与开发工具的实践。",
   siteUrl: "https://honghuang.foomansoft.com/",
   authorName: "Hong Huang",
