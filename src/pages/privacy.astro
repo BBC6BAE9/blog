@@ -27,7 +27,7 @@ const allPosts = visiblePosts(await getCollection("posts"));
         <h2>文章评论</h2>
         <p>评论通过 giscus 和 GitHub Discussions 提供。加载评论时会连接相关服务；发表评论需要登录 GitHub，评论会公开显示在对应的讨论中。请不要在评论里留下密码或其他敏感信息。</p>
         <h2>订阅更新</h2>
-        <p><a href={withBase("/rss.xml")}>RSS 订阅</a>不需要向本站提供邮箱。邮件订阅如已开放，会由订阅页面所标明的邮件服务提供商处理邮箱信息、发送文章更新并提供退订功能；请在提交邮箱前阅读该服务的隐私说明。</p>
+        <p><a href={withBase("/rss.xml")}>RSS 订阅</a>不需要向本站提供邮箱。邮件订阅由 follow.it 处理邮箱信息、发送文章更新并提供退订功能。免费邮件可能包含该服务的推荐内容；请在提交邮箱前阅读其<a href="https://follow.it/info/privacy" target="_blank" rel="noopener noreferrer">隐私政策</a>。</p>
         <h2>联系</h2>
         <p>关于本站的隐私问题，可以写信到 <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>。</p>
       </div>

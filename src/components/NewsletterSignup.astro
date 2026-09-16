@@ -9,7 +9,7 @@ const canSubscribe = newsletter.enabled && action.length > 0;
 
 <section id="newsletter" aria-labelledby="newsletter-heading">
   <h3 id="newsletter-heading" class="text-base font-semibold tracking-tight">订阅更新</h3>
-  <p class="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">通过 RSS 阅读最新文章，让内容在你方便的时候到达。</p>
+  <p class="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">选择 RSS 或邮件，在你方便的时候阅读新文章。</p>
   <a href={withBase("/rss.xml")} class="btn btn-outline btn-block mt-5">RSS 订阅</a>
   {canSubscribe ? (
     <form class="mt-5 grid gap-3" action={action} method={newsletter.method}>
@@ -17,7 +17,8 @@ const canSubscribe = newsletter.enabled && action.length > 0;
       <label class="sr-only" for="newsletter-email">邮箱地址</label>
       <input id="newsletter-email" required type="email" name={newsletter.emailFieldName} autocomplete="email" placeholder="你的邮箱地址" class="field" />
       <button type="submit" class="btn btn-solid btn-block">邮件订阅</button>
-      <p class="text-xs leading-relaxed text-muted-foreground">提交后请按邮件提示确认订阅。你可以随时退订。</p>
+      <p class="text-xs leading-relaxed text-muted-foreground">邮件由 follow.it 发送，可能包含推荐内容。提交后请在邮箱确认订阅，可随时退订。</p>
+      <a class="text-xs text-muted-foreground link-sweep" href="https://follow.it" target="_blank" rel="noopener noreferrer">Powered by follow.it</a>
     </form>
   ) : (
     <p class="mt-3 text-xs leading-relaxed text-muted-foreground">邮件订阅即将开放。</p>
