@@ -20,6 +20,13 @@ export const postSlug = (post: Post) => post.id.replace(/\/index$/, "");
 
 export const postHref = (post: Post) => withBase(`/post/${postSlug(post)}/`);
 
+/**
+ * Stable identity from the original GitHub Pages publication namespace.
+ * Keep this independent of the current domain/base to preserve discussions
+ * and RSS item IDs, including for future posts.
+ */
+export const postIdentity = (post: Post) => `blog/post/${postSlug(post)}/`;
+
 export const byNewest = (a: Post, b: Post) => b.data.date.getTime() - a.data.date.getTime();
 
 export const visiblePosts = (posts: Post[]) =>

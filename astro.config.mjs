@@ -16,7 +16,7 @@ const shikiConfig = /** @type {const} */ ({
 
 export default defineConfig({
   site: siteConfig.siteUrl,
-  base: "/blog",
+  base: "/",
   trailingSlash: "always",
   integrations: [
     sitemap({

@@ -19,6 +19,7 @@ import {
   getAdjacent,
   getRelated,
   postHref,
+  postIdentity,
   postSlug,
   readingLabel,
   visiblePosts,
@@ -169,7 +170,7 @@ const structuredData = {
         <Content components={mdxComponents} />
       </div>
 
-      <Comments />
+      <Comments discussionTerm={postIdentity(post)} />
 
       {(newer || older) && (
         <footer class="canvas mt-16 border-t border-border pt-8">
