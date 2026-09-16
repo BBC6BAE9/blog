@@ -1,0 +1,44 @@
+---
+import { siteConfig } from "@/config/site";
+const comments = siteConfig.comments;
+---
+{comments.enabled && (
+  <section id="comments" class="canvas mt-16 border-t border-border pt-8" aria-labelledby="comments-heading">
+    <h2 id="comments-heading" class="section-title">评论与交流</h2>
+    <p class="mb-6 text-sm leading-relaxed text-muted-foreground">
+      欢迎讨论。使用 GitHub 账号参与，评论公开保存在这个博客的 Discussions 中。
+      <a class="link-sweep" href={`https://github.com/${comments.repo}/discussions`} target="_blank" rel="noopener noreferrer">在 GitHub 打开</a>
+    </p>
+    <div class="giscus" data-comment-config={JSON.stringify(comments)}></div>
+    <noscript><p>请前往 GitHub Discussions 阅读和发表评论。</p></noscript>
+  </section>
+)}
+<script>
+  const mount = document.querySelector<HTMLElement>("[data-comment-config]");
+  if (mount) {
+    const config = JSON.parse(mount.dataset.commentConfig ?? "{}");
+    const theme = () => document.documentElement.dataset.theme === "dark" ? "noborder_dark" : "noborder_light";
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    const attributes: Record<string, string> = {
+      "data-repo": config.repo,
+      "data-repo-id": config.repoId,
+      "data-category": config.category,
+      "data-category-id": config.categoryId,
+      "data-mapping": "pathname",
+      "data-strict": "1",
+      "data-reactions-enabled": "1",
+      "data-emit-metadata": "0",
+      "data-input-position": "top",
+      "data-theme": theme(),
+      "data-lang": "zh-CN",
+      "data-loading": "lazy",
+    };
+    for (const [key, value] of Object.entries(attributes)) script.setAttribute(key, value);
+    mount.append(script);
+    const syncTheme = () => mount.querySelector<HTMLIFrameElement>("iframe.giscus-frame")?.contentWindow?.postMessage({ giscus: { setConfig: { theme: theme() } } }, "https://giscus.app");
+    new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
+</script>

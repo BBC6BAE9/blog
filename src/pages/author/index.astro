@@ -1,0 +1,46 @@
+---
+import { withBase } from "@/lib/urls";
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { siteConfig } from "@/config/site";
+import { getAllAuthors, visiblePosts } from "@/lib/posts";
+
+const allPosts = visiblePosts(await getCollection("posts"));
+const authors = getAllAuthors(allPosts);
+---
+
+<BaseLayout title="作者" description={`${siteConfig.name} 的作者与文章。`}>
+  <SiteHeader posts={allPosts} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">归档</p>
+        <h1 class="pagehead-title">作者</h1>
+        <p class="pagehead-description">
+          记录技术实践，分享构建过程。
+        </p>
+      </header>
+
+      <ul class="grid gap-5">
+        {
+          authors.map((author) => (
+            <li class="border-b border-border pb-5 last:border-b-0">
+              <a href={withBase(`/author/${author.slug}/`)} class="link-title flex items-baseline justify-between gap-4">
+                <span>
+                  <span class="link-title__text block text-xl font-semibold tracking-tight">{author.name}</span>
+                  <span class="mt-1 block text-sm text-muted-foreground">{author.role}</span>
+                </span>
+                <span class="pill shrink-0">
+                  {author.posts.length} 篇
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>

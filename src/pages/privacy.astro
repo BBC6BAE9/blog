@@ -1,0 +1,37 @@
+---
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { siteConfig } from "@/config/site";
+import { visiblePosts } from "@/lib/posts";
+import { withBase } from "@/lib/urls";
+
+const allPosts = visiblePosts(await getCollection("posts"));
+---
+
+<BaseLayout title="隐私说明" description={`${siteConfig.name} 的本地偏好设置、评论和订阅隐私说明。`}>
+  <SiteHeader posts={allPosts} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">隐私</p>
+        <h1 class="pagehead-title">隐私说明</h1>
+        <p class="pagehead-description">关于阅读偏好、评论与订阅的一些说明。</p>
+      </header>
+      <div class="prose">
+        <h2>浏览本站</h2>
+        <p>本站是托管在 GitHub Pages 上的静态博客，阅读文章不需要注册账号。本站没有主动加入广告追踪或流量统计脚本；托管服务的相关数据处理请参阅 <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub 隐私声明</a>。</p>
+        <h2>阅读偏好</h2>
+        <p>你选择的浅色或深色模式会保存在当前浏览器的本地存储中，用于记住阅读偏好。可以通过清除本站的浏览器数据重置它。</p>
+        <h2>文章评论</h2>
+        <p>评论通过 giscus 和 GitHub Discussions 提供。加载评论时会连接相关服务；发表评论需要登录 GitHub，评论会公开显示在对应的讨论中。请不要在评论里留下密码或其他敏感信息。</p>
+        <h2>订阅更新</h2>
+        <p><a href={withBase("/rss.xml")}>RSS 订阅</a>不需要向本站提供邮箱。邮件订阅如已开放，会由订阅页面所标明的邮件服务提供商处理邮箱信息、发送文章更新并提供退订功能；请在提交邮箱前阅读该服务的隐私说明。</p>
+        <h2>联系</h2>
+        <p>关于本站的隐私问题，可以写信到 <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>。</p>
+      </div>
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>

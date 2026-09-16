@@ -1,0 +1,72 @@
+---
+import { withBase } from "@/lib/urls";
+import { getCollection } from "astro:content";
+import type { GetStaticPaths, Page } from "astro";
+import PostCard from "@/components/PostCard.astro";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { siteConfig } from "@/config/site";
+import { visiblePosts, type Post } from "@/lib/posts";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = visiblePosts(await getCollection("posts"));
+  return paginate(posts, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<Post>;
+}
+
+const { page } = Astro.props;
+const allPosts = visiblePosts(await getCollection("posts"));
+const title = page.currentPage === 1 ? "文章归档" : `文章归档 · 第 ${page.currentPage} 页`;
+const description = `${siteConfig.name} 的全部文章，按发布时间排序。`;
+const withTrailingSlash = (url: string | undefined) => (url && !url.endsWith("/") ? `${url}/` : url);
+const prevUrl = withTrailingSlash(page.url.prev);
+const nextUrl = withTrailingSlash(page.url.next);
+---
+
+<BaseLayout title={title} description={description} prevUrl={prevUrl} nextUrl={nextUrl}>
+  <SiteHeader posts={allPosts} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">归档</p>
+        <h1 class="pagehead-title">全部文章</h1>
+        <p class="pagehead-description">
+          共 {page.total} 篇文章，按发布时间倒序排列。
+        </p>
+      </header>
+
+      <div class="feed">
+        {page.data.map((post) => <PostCard post={post} />)}
+      </div>
+
+      <nav class="mt-16 flex items-center justify-between gap-4 border-t border-border pt-6" aria-label="文章归档分页">
+        {
+          prevUrl ? (
+            <a href={withBase(prevUrl)} class="nav-link link-nudge">
+              <span class="link-nudge__arrow link-nudge__arrow--prev">&larr;</span> 较新文章
+            </a>
+          ) : (
+            <span class="nav-link opacity-40">&larr; 较新文章</span>
+          )
+        }
+        <span class="text-xs tracking-widest text-muted-foreground uppercase">
+          第 {page.currentPage} / {page.lastPage} 页
+        </span>
+        {
+          nextUrl ? (
+            <a href={withBase(nextUrl)} class="nav-link link-nudge">
+              较早文章 <span class="link-nudge__arrow link-nudge__arrow--next">&rarr;</span>
+            </a>
+          ) : (
+            <span class="nav-link opacity-40">较早文章 &rarr;</span>
+          )
+        }
+      </nav>
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>

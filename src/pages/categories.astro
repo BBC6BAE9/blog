@@ -1,0 +1,52 @@
+---
+import { withBase } from "@/lib/urls";
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { categoryDescriptions } from "@/config/categories";
+import { siteConfig } from "@/config/site";
+import { categoryHref, getCategoryList, visiblePosts } from "@/lib/posts";
+
+const allPosts = visiblePosts(await getCollection("posts"));
+const categoryList = getCategoryList(allPosts);
+---
+
+<BaseLayout
+  title="文章分类"
+  description={`${siteConfig.name} 的文章分类与归档。`}
+>
+  <SiteHeader posts={allPosts} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">归档</p>
+        <h1 class="pagehead-title">文章分类</h1>
+        <p class="pagehead-description">
+          共 {allPosts.length} 篇文章，分为 {categoryList.length} 个主题。
+        </p>
+      </header>
+
+      <ul class="grid gap-7">
+        {
+          categoryList.map((category) => (
+            <li class="border-b border-border pb-7 last:border-b-0">
+              <a href={withBase(categoryHref(category.name))} class="link-title">
+                <span class="flex items-baseline justify-between gap-4">
+                  <span class="link-title__text text-xl font-semibold tracking-tight">{category.name}</span>
+                  <span class="pill shrink-0">
+                    {category.count} 篇
+                  </span>
+                </span>
+                <span class="mt-2 block max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">
+                  {categoryDescriptions[category.name]}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>

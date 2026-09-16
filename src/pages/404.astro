@@ -1,0 +1,28 @@
+---
+import { withBase } from "@/lib/urls";
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { visiblePosts } from "@/lib/posts";
+
+const allPosts = visiblePosts(await getCollection("posts"));
+---
+
+<BaseLayout title="页面未找到" description="没有找到你访问的页面。" noindex>
+  <SiteHeader posts={allPosts} />
+  <main id="content" class="outer grid min-h-[55vh] place-items-center py-16 text-center">
+    <div>
+      <p class="eyebrow">404</p>
+      <h1 class="pagehead-title">页面未找到</h1>
+      <p class="pagehead-description mx-auto">
+        文章可能已经移动，或链接地址有误。
+      </p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <a href={withBase("/")} class="btn btn-solid">返回首页</a>
+        <a href={withBase("/posts/")} class="btn btn-outline">查看全部文章</a>
+      </div>
+    </div>
+  </main>
+  <SiteFooter />
+</BaseLayout>
