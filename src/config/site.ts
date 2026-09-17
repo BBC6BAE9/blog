@@ -10,7 +10,7 @@ export const siteConfig = {
   dateLocale: "zh-CN",
   locale: "zh_CN",
   socialImage: "/og-image.png",
-  about: "我是 Hong，一名全栈开发者。专注于 Apple 平台、生成式 UI、播放器与开发工具，在这里记录问题、思考和实践。",
+  about: "I’m a full-stack engineer working on Apple platform apps at Tencent. My current interests include using AI-assisted coding to ship better products, generative UI, and streaming technology.",
   newsletter: {
     enabled: true,
     action: "https://api.follow.it/subscription-form/WUNnQmhFNVVycVhSd0FjRnc4blFQNDQvbzVJUUcwRnpFNHdvSWp1SUk0L0xrRk41d0kvTVcvVzdVazN1YzNNK2FvSWxTVW5aNU1aUUU4UTRla3dkZG9rcXA3ZHJXaXRpbVJXQUdEUHNiZDI4eG1qY2NQa2RzTXRPdFh6V0xBdWx8Tkw5c1VZbWZYaHVQNjlsMnRJZm0vaW5WLzIwZncwZis3NXdEZklHR3g4ND0=/8",
