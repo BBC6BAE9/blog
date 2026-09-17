@@ -2,34 +2,22 @@
 import { getCollection } from "astro:content";
 import SiteFooter from "@/components/SiteFooter.astro";
 import SiteHeader from "@/components/SiteHeader.astro";
+import { siteConfig } from "@/config/site";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { visiblePosts } from "@/lib/posts";
-import { withBase } from "@/lib/urls";
 
 const allPosts = visiblePosts(await getCollection("posts"));
 ---
 
-<BaseLayout title="关于我" description="我是 Hong Huang，一名软件工程师，关注 Apple 平台开发、AI 应用与开源工具。">
+<BaseLayout title="About me" description={siteConfig.about}>
   <SiteHeader posts={allPosts} />
   <main id="content" class="outer">
     <div class="canvas">
-      <header class="pagehead">
-        <p class="eyebrow">关于我</p>
+      <header class="pagehead" lang="en">
+        <p class="eyebrow">About me</p>
         <h1 class="pagehead-title">Hong Huang</h1>
-        <p class="pagehead-description">写代码，做工具，把想法变成可以使用的东西。</p>
+        <p class="pagehead-description">{siteConfig.about}</p>
       </header>
-      <div class="prose">
-        <p>你好，我是 Hong Huang，2019 年加入腾讯，现任高级工程师。这里记录我在软件开发中的实践、思考与探索。</p>
-        <h2>我在关注什么</h2>
-        <p>我的兴趣包括 Apple 平台上的 Swift 与 SwiftUI 开发、AI 应用和交互，以及音视频工具。比起只展示结果，我更希望把设计选择、实现过程和踩过的坑一起留下来。</p>
-        <h2>开源与项目</h2>
-        <p>我在探索让 AI 与原生界面协作的方式，也在维护与之相关的 Swift 项目，包括 <a href="https://github.com/BBC6BAE9/a2ui-swift">a2ui-swift</a> 和 <a href="https://github.com/BBC6BAE9/a2a-swift">a2a-swift</a>。更多项目可以在 <a href="https://github.com/BBC6BAE9">GitHub</a> 上找到。</p>
-        <h2>关于这个博客</h2>
-        <p>这里是我的个人技术博客。内容主要围绕开发实践、开源项目和工具使用展开，也会留下一些学习笔记。文中观点仅代表个人。</p>
-        <p>原来的<a href="https://bbc6bae9.github.io/zh/">个人主页</a>会继续保留；这里用来放更完整的文章。</p>
-        <h2>保持联系</h2>
-        <p>欢迎讨论、反馈或指出文章中的问题。可以前往<a href={withBase("/contact/")}>联系页面</a>，也可以通过 <a href={withBase("/rss.xml")}>RSS</a> 订阅新文章。</p>
-      </div>
     </div>
   </main>
   <SiteFooter />
