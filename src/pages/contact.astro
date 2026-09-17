@@ -9,25 +9,25 @@ import { visiblePosts } from "@/lib/posts";
 const allPosts = visiblePosts(await getCollection("posts"));
 ---
 
-<BaseLayout title="联系我" description="通过邮件、GitHub 或 X 联系 Hong Huang。">
+<BaseLayout title="Contact" description="Get in touch with Hong Huang by email, GitHub, or X.">
   <SiteHeader posts={allPosts} />
-  <main id="content" class="outer">
+  <main id="content" class="outer" lang="en">
     <div class="canvas">
       <header class="pagehead">
-        <p class="eyebrow">联系</p>
-        <h1 class="pagehead-title">聊聊你的想法</h1>
-        <p class="pagehead-description">文章勘误、技术交流、开源项目反馈，欢迎联系。</p>
+        <p class="eyebrow">Contact</p>
+        <h1 class="pagehead-title">Let’s talk</h1>
+        <p class="pagehead-description">I welcome article corrections, technical discussions, and feedback on open-source projects.</p>
       </header>
       <div class="prose">
-        <h2>邮件</h2>
-        <p>可以直接写信到 <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>。如果是文章反馈，请附上文章链接和相关信息，方便我了解问题。</p>
+        <h2>Email</h2>
+        <p>Email me at <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>. For feedback on an article, please include a link and any relevant details.</p>
         <h2>GitHub</h2>
-        <p>开源项目相关的问题，欢迎在对应仓库提交 Issue，方便其他使用者一起讨论。</p>
+        <p>For questions about an open-source project, please open an issue in the relevant repository so others can join the discussion.</p>
         <p><a href="https://github.com/BBC6BAE9">github.com/BBC6BAE9</a></p>
         <h2>X</h2>
         <p><a href="https://x.com/Bae9Bbc6">@Bae9Bbc6</a></p>
       </div>
-      <a href={`mailto:${siteConfig.email}`} class="btn btn-solid mt-8">给我发邮件</a>
+      <a href={`mailto:${siteConfig.email}`} class="btn btn-solid mt-8">Email me</a>
     </div>
   </main>
   <SiteFooter />
