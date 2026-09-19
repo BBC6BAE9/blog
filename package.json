@@ -25,14 +25,15 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "check": "astro check",
+    "build": "astro build && npm run build --prefix portfolio && node scripts/merge-portfolio.mjs",
+    "check": "astro check && npm run check --prefix portfolio",
     "release:check": "npm run check && npm run build && npm run format:check",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "new-post": "node scripts/new-post.mjs"
+    "new-post": "node scripts/new-post.mjs",
+    "dev:portfolio": "npm run dev --prefix portfolio"
   },
   "overrides": {
     "yaml": "^2.8.3"

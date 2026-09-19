@@ -3,6 +3,7 @@
 基于 [Monograph](https://github.com/xocothemes/monograph) 的中文个人技术博客，使用 Astro 生成静态页面，通过 GitHub Actions 发布到 GitHub Pages。Cloudflare 管理自定义域名的 DNS，网站内容由 GitHub Pages 提供，无需自建服务器。
 
 - 博客：[honghuang.foomansoft.com](https://honghuang.foomansoft.com/)
+- 作品集：[honghuang.foomansoft.com/portfolio/](https://honghuang.foomansoft.com/portfolio/)
 - 源码：[BBC6BAE9/blog](https://github.com/BBC6BAE9/blog)
 - RSS：[订阅最新文章](https://honghuang.foomansoft.com/rss.xml)
 - 原来的[个人主页](https://bbc6bae9.github.io/zh/)继续独立保留。
@@ -15,10 +16,18 @@
 git clone https://github.com/BBC6BAE9/blog.git
 cd blog
 npm install
+npm install --prefix portfolio
 npm run dev
 ```
 
 打开终端显示的地址，通常是 [localhost:4321/](http://localhost:4321/)。
+作品集是同仓库内的独立 Astro 应用，运行 `npm run dev:portfolio` 可单独预览；正式构建会自动把它合并到 `/portfolio/`。
+
+## 添加作品
+
+复制 `portfolio/src/content/work/project-starter.md`，把副本改成项目名称对应的小写英文文件名，填写英文内容，并把 `draft` 改为 `false`。例如 `my-app.md` 会发布到 `/portfolio/work/my-app/`。
+
+项目正文使用 Markdown。图片或 GIF 可以和 Markdown 文件放在同一目录，用 `![说明](./image.png)` 引用；也可通过 `cover` 字段设置详情页顶部的封面图。完整说明见 [portfolio/README.md](./portfolio/README.md)。
 
 ## 写一篇文章
 
@@ -93,6 +102,6 @@ GitHub 仓库 Pages 设置中的 Custom domain 应为 `honghuang.foomansoft.com`
 
 ## 主题与许可
 
-主题来自 [Monograph / xocothemes](https://github.com/xocothemes/monograph)，作者 Andrei Alba。本项目保留原主题的 [MIT 许可及资源许可说明](./LICENSE)。
+博客主题来自 [Monograph / xocothemes](https://github.com/xocothemes/monograph)，作者 Andrei Alba。本项目保留原主题的 [MIT 许可及资源许可说明](./LICENSE)。作品集主题基于 [Astro Starter Portfolio](https://github.com/BracoZS/astro-starter-portfolio)，作者 BracoZS，并在 `portfolio/LICENSE` 中保留其 MIT 许可。
 
 [上游 CUSTOMIZATION.md](./CUSTOMIZATION.md) 可用于参考主题样式与 MDX 组件；本站的中文内容、评论、联系页面和订阅接入方式以当前代码及本说明为准。

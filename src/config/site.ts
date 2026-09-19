@@ -39,6 +39,7 @@ export const siteConfig = {
   ],
 };
 export const navigation = [
+  { label: "作品集", href: "/portfolio/" },
   { label: "文章", href: "/posts/" },
   { label: "分类", href: "/categories/" },
   { label: "关于", href: "/about/" },
