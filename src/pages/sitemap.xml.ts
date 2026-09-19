@@ -1,5 +1,6 @@
 import { siteConfig } from "@/config/site";
 
+const portfolioSitemapUrl = new URL("portfolio/sitemap-0.xml", siteConfig.siteUrl).toString();
 const sitemapUrl = new URL("sitemap-0.xml", siteConfig.siteUrl).toString();
 
 export function GET() {
@@ -8,6 +9,9 @@ export function GET() {
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>${sitemapUrl}</loc>
+  </sitemap>
+  <sitemap>
+    <loc>${portfolioSitemapUrl}</loc>
   </sitemap>
 </sitemapindex>
 `,

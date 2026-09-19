@@ -12,3 +12,6 @@ pnpm-lock.yaml
 package-lock.json
 bun.lock
 routeTree.gen.ts
+
+# Separate Astro app with its own formatter configuration
+portfolio

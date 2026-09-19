@@ -1,0 +1,21 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/Button.astro';
+import { SITE } from '@/site.config';
+---
+
+<BaseLayout title="About" description={`A bit about ${SITE.name} and how they work.`}>
+  <section class="mx-auto max-w-3xl px-6 pt-16 pb-24 sm:pt-24">
+    <p class="text-ink-soft mb-6 font-mono text-xs tracking-[0.2em] uppercase">About</p>
+
+    <h1 class="font-display text-ink max-w-xl text-3xl font-medium sm:text-4xl">
+      {SITE.role}.
+    </h1>
+
+    <div class="prose prose-sm sm:prose-base mt-8 max-w-xl">
+      <p>{SITE.bio}</p>
+    </div>
+
+    <Button href={`mailto:${SITE.email}`} class="mt-10">Get in touch</Button>
+  </section>
+</BaseLayout>
