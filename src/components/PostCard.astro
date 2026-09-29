@@ -1,6 +1,7 @@
 ---
 import { withBase } from "@/lib/urls";
 import { formatDate, postHref, readingLabel, type Post } from "@/lib/posts";
+import { defaultLocale, type Locale } from "@/i18n";
 
 interface Props {
   post: Post;
@@ -13,14 +14,15 @@ interface Props {
   headingLevel?: "h2" | "h3";
   /** Prefixes the date with a short label, e.g. "Latest". */
   dateLabel?: string;
+  locale?: Locale;
 }
 
-const { post, variant = "feed", headingLevel = "h2", dateLabel } = Astro.props;
+const { post, variant = "feed", headingLevel = "h2", dateLabel, locale = defaultLocale } = Astro.props;
 const { title, excerpt, date, author } = post.data;
-const href = withBase(postHref(post));
+const href = withBase(postHref(post, locale));
 const Heading = headingLevel;
 const isoDate = date.toISOString();
-const readableDate = formatDate(date);
+const readableDate = formatDate(date, locale);
 ---
 
 <article class:list={["card", `card-${variant}`]}>
@@ -45,7 +47,7 @@ const readableDate = formatDate(date);
       ) : (
         <time class="meta-accent" datetime={isoDate}>{readableDate}</time>
       )}
-      {variant !== "compact" && <span>{readingLabel(post)}</span>}
+      {variant !== "compact" && <span>{readingLabel(post, locale)}</span>}
     </p>
   </a>
 </article>

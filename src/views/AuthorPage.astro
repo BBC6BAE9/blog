@@ -1,0 +1,41 @@
+---
+import { withBase } from "@/lib/urls";
+import PostCard from "@/components/PostCard.astro";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getMessages, localizedPath, type Locale } from "@/i18n";
+import { authorSlug, visiblePosts, type Post } from "@/lib/posts";
+
+interface Props {
+  locale: Locale;
+  author: { slug: string; name: string; role: string; posts: Post[] };
+  allPosts: Post[];
+}
+
+const { locale, author, allPosts } = Astro.props;
+const copy = getMessages(locale).author;
+const posts = visiblePosts(allPosts, locale).filter((post) => authorSlug(post.data.author.name) === author.slug);
+---
+
+<BaseLayout locale={locale} title={author.name} description={copy.publishedBy(author.name)}>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h1 class="pagehead-title">{author.name}</h1>
+        <p class="pagehead-description">{author.role} &middot; {copy.postCount(posts.length)}</p>
+      </header>
+
+      <div class="feed">
+        {posts.map((post) => <PostCard post={post} locale={locale} />)}
+      </div>
+
+      <a href={withBase(localizedPath(locale, "/author/"))} class="btn btn-outline btn-block mt-16">
+        {copy.all}
+      </a>
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+</BaseLayout>

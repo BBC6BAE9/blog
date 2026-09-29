@@ -1,17 +1,14 @@
 ---
+import { getMessages, localeFromPath } from "@/i18n";
+
 interface Props {
   type?: "note" | "tip" | "warning" | "danger";
   title?: string;
 }
 
 const { type = "note", title } = Astro.props;
-
-const defaultTitles: Record<NonNullable<Props["type"]>, string> = {
-  note: "说明",
-  tip: "提示",
-  warning: "注意",
-  danger: "重要",
-};
+const copy = getMessages(localeFromPath(Astro.url.pathname));
+const defaultTitles: Record<NonNullable<Props["type"]>, string> = copy.callout;
 
 const heading = title ?? defaultTitles[type];
 ---

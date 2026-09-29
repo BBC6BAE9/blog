@@ -1,0 +1,51 @@
+---
+import { withBase } from "@/lib/urls";
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { categoryDescription, categoryLabel } from "@/config/categories";
+import { getMessages, type Locale } from "@/i18n";
+import { categoryHref, getCategoryList, visiblePosts } from "@/lib/posts";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getMessages(locale).category;
+const allPosts = visiblePosts(await getCollection("posts"), locale);
+const categoryList = getCategoryList(allPosts);
+---
+
+<BaseLayout locale={locale} title={copy.title} description={copy.description}>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">{copy.archiveEyebrow}</p>
+        <h1 class="pagehead-title">{copy.title}</h1>
+        <p class="pagehead-description">{copy.summary(allPosts.length, categoryList.length)}</p>
+      </header>
+
+      <ul class="grid gap-7">
+        {categoryList.map((category) => (
+          <li class="border-b border-border pb-7 last:border-b-0">
+            <a href={withBase(categoryHref(category.name, locale))} class="link-title">
+              <span class="flex items-baseline justify-between gap-4">
+                <span class="link-title__text text-xl font-semibold tracking-tight">
+                  {categoryLabel(category.name, locale)}
+                </span>
+                <span class="pill shrink-0">{copy.postCount(category.count)}</span>
+              </span>
+              <span class="mt-2 block max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">
+                {categoryDescription(category.name, locale)}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+</BaseLayout>

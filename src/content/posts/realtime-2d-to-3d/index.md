@@ -3,6 +3,7 @@ title: "Real-Time 2D to 3D: From Depth Maps to Stereo Views"
 excerpt: "How can an ordinary image gain depth on Vision Pro? An exploration of monocular depth estimation, stereo view synthesis, and the engineering work needed to extend the pipeline to video."
 category: "Apple 平台"
 language: "en"
+translationKey: "realtime-2d-to-3d"
 date: 2025-04-24
 author:
   name: "Hong Huang"

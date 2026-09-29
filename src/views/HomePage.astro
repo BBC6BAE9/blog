@@ -1,0 +1,100 @@
+---
+import { withBase } from "@/lib/urls";
+import { getCollection } from "astro:content";
+import NewsletterSignup from "@/components/NewsletterSignup.astro";
+import PostCard from "@/components/PostCard.astro";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { categoryLabel } from "@/config/categories";
+import { siteConfig } from "@/config/site";
+import { getMessages, localizedPath, type Locale } from "@/i18n";
+import { categoryHref, getCategoryList, getFeatured, visiblePosts } from "@/lib/posts";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getMessages(locale);
+const allPosts = visiblePosts(await getCollection("posts"), locale);
+const [latest, ...rest] = allPosts;
+const feed = rest.slice(0, 8);
+const featured = getFeatured(allPosts, 4).filter((post) => post.id !== latest?.id);
+const categoryList = getCategoryList(allPosts);
+const hasMore = rest.length > feed.length;
+---
+
+<BaseLayout locale={locale} description={copy.site.description}>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="inner">
+      <h1 class="sr-only">{siteConfig.name} — {copy.site.tagline}</h1>
+
+      {latest && (
+        <section class="pt-10 pb-[var(--space-section)] md:pt-14" aria-label={copy.home.latestAria}>
+          <PostCard post={latest} locale={locale} variant="lead" headingLevel="h2" dateLabel={copy.home.latest} />
+        </section>
+      )}
+
+      <div class="grid gap-[var(--space-section)] lg:grid-cols-[minmax(0,4fr)_minmax(0,2fr)] lg:gap-12">
+        <section aria-labelledby="more-posts">
+          <h2 id="more-posts" class="section-title">{copy.home.morePosts}</h2>
+
+          {feed.length > 0 ? (
+            <div class="feed">
+              {feed.map((post) => <PostCard post={post} locale={locale} />)}
+            </div>
+          ) : (
+            <p class="text-muted-foreground">{copy.home.noPosts}</p>
+          )}
+
+          {hasMore && (
+            <a href={withBase(localizedPath(locale, "/posts/"))} class="btn btn-outline btn-block mt-16">
+              {copy.home.allPosts}
+            </a>
+          )}
+        </section>
+
+        <aside class="sidebar">
+          <section aria-labelledby="about-heading">
+            <h2 id="about-heading" class="section-title">{copy.home.about}</h2>
+            <p class="text-lg font-semibold tracking-tight">{siteConfig.name}</p>
+            <p class="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">{copy.site.about}</p>
+            <div class="mt-7 border-t border-border pt-6">
+              <NewsletterSignup locale={locale} />
+            </div>
+          </section>
+
+          {featured.length > 0 && (
+            <section aria-labelledby="featured-heading">
+              <h2 id="featured-heading" class="section-title">{copy.home.featured}</h2>
+              <div class="grid gap-7">
+                {featured.map((post) => <PostCard post={post} locale={locale} variant="compact" headingLevel="h3" />)}
+              </div>
+            </section>
+          )}
+
+          {categoryList.length > 0 && (
+            <section aria-labelledby="categories-heading">
+              <h2 id="categories-heading" class="section-title">{copy.home.categories}</h2>
+              <ul class="grid gap-4">
+                {categoryList.map((category) => (
+                  <li>
+                    <a href={withBase(categoryHref(category.name, locale))} class="link-title flex items-center justify-between gap-3">
+                      <span class="link-title__text text-base font-semibold tracking-tight">
+                        {categoryLabel(category.name, locale)}
+                      </span>
+                      <span class="pill shrink-0">{copy.home.postCount(category.count)}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </aside>
+      </div>
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+</BaseLayout>

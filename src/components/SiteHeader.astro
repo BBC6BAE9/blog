@@ -1,34 +1,65 @@
 ---
 import { withBase } from "@/lib/urls";
-import { navigation, siteConfig } from "@/config/site";
+import { categoryLabel } from "@/config/categories";
+import { siteConfig } from "@/config/site";
+import {
+  alternateLocalePath,
+  defaultLocale,
+  getMessages,
+  localeMeta,
+  locales,
+  localizedPath,
+  type Locale,
+} from "@/i18n";
 import { formatDate, postHref, readingLabel, visiblePosts, type Post } from "@/lib/posts";
 
 interface Props {
   posts: Post[];
+  locale?: Locale;
 }
 
+const locale = Astro.props.locale ?? defaultLocale;
+const copy = getMessages(locale);
 const currentPath = Astro.url.pathname;
-const posts = visiblePosts(Astro.props.posts);
+const posts = visiblePosts(Astro.props.posts, locale);
+const navigation = [
+  { label: copy.nav.portfolio, href: "/portfolio/" },
+  { label: copy.nav.posts, href: localizedPath(locale, "/posts/") },
+  { label: copy.nav.categories, href: localizedPath(locale, "/categories/") },
+  { label: copy.nav.about, href: localizedPath(locale, "/about/") },
+];
+const languageOptions = locales.map((optionLocale) => ({
+  locale: optionLocale,
+  label: localeMeta[optionLocale].label,
+  href: alternateLocalePath(currentPath, optionLocale),
+}));
 /* Inlined so the palette still returns results if /search-index.json fails. */
 const searchFallback = posts.slice(0, 12).map((post) => ({
   title: post.data.title,
   excerpt: post.data.excerpt,
-  href: withBase(postHref(post)),
+  href: withBase(postHref(post, locale)),
   author: post.data.author.name,
-  category: post.data.category,
-  date: formatDate(post.data.date),
-  reading: readingLabel(post),
+  category: categoryLabel(post.data.category, locale),
+  date: formatDate(post.data.date, locale),
+  reading: readingLabel(post, locale),
 }));
+const searchCopy = {
+  results: copy.search.results,
+  noResults: copy.search.noResults,
+  resultSingular: locale === "en" ? "result" : locale === "ja" ? "件" : "条",
+  resultPlural: locale === "en" ? "results" : locale === "ja" ? "件" : "条",
+  locale,
+};
 const isCurrentPath = (href: string) =>
   currentPath === withBase(href) || (href !== "/" && currentPath.startsWith(withBase(href)));
 ---
 
 <header class="site-header outer">
   <div class="inner flex items-center justify-between gap-6 py-2.5">
-    <a href={withBase("/")} class="wordmark">{siteConfig.name}</a>
+    <a href={withBase(localizedPath(locale, "/"))} class="wordmark">{siteConfig.name}</a>
 
     <div class="flex items-center gap-5">
-      <nav class="hidden items-center gap-6 md:flex" aria-label="主导航">
+      <nav class="hidden items-center gap-6 md:flex" aria-label={copy.nav.main}>
         {
           navigation.map((item) => (
             <a
@@ -44,9 +75,9 @@ const isCurrentPath = (href: string) =>
 
       <div class="flex items-center gap-1">
         <a
-          href={withBase("/search/")}
+          href={withBase(localizedPath(locale, "/search/"))}
           class="icon-btn"
-          aria-label="搜索本站"
+          aria-label={copy.search.site}
           aria-haspopup="dialog"
           aria-controls="site-search-dialog"
           data-search-toggle
@@ -63,7 +94,7 @@ const isCurrentPath = (href: string) =>
           role="switch"
           aria-checked="false"
           data-theme-toggle
-          aria-label="切换到深色模式"
+          aria-label={copy.theme.toDark}
         >
           <span class="theme-switch__knob" aria-hidden="true">
             <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none">
@@ -76,6 +107,45 @@ const isCurrentPath = (href: string) =>
           </span>
         </button>
 
+        <div class="language-menu" data-language-menu>
+          <button
+            type="button"
+            class="language-trigger"
+            aria-label={copy.language.label}
+            aria-haspopup="menu"
+            aria-expanded="false"
+            data-language-toggle
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="8.25" stroke="currentColor" stroke-width="1.6" />
+              <path d="M3.9 12h16.2M12 3.75c2.1 2.25 3.15 5 3.15 8.25S14.1 18 12 20.25C9.9 18 8.85 15.25 8.85 12S9.9 6 12 3.75Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+            <span>{localeMeta[locale].shortLabel}</span>
+            <svg aria-hidden="true" class="language-chevron" viewBox="0 0 12 12" fill="none">
+              <path d="m3 4.5 3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="language-popover" role="menu" aria-label={copy.language.menu} data-language-popover hidden>
+            {languageOptions.map((option) => (
+              <a
+                href={withBase(option.href)}
+                hreflang={localeMeta[option.locale].htmlLang}
+                lang={localeMeta[option.locale].htmlLang}
+                role="menuitem"
+                aria-current={option.locale === locale ? "true" : undefined}
+                data-language-link
+              >
+                <span>{option.label}</span>
+                {option.locale === locale && (
+                  <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
+                    <path d="m3.5 8 3 3 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                )}
+              </a>
+            ))}
+          </div>
+        </div>
+
         <button
           type="button"
           class="icon-btn md:hidden"
@@ -86,7 +156,7 @@ const isCurrentPath = (href: string) =>
           <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
           </svg>
-          <span class="sr-only">打开导航菜单</span>
+          <span class="sr-only">{copy.nav.openMenu}</span>
         </button>
       </div>
     </div>
@@ -99,28 +169,28 @@ const isCurrentPath = (href: string) =>
   aria-labelledby="site-search-title"
   aria-describedby="site-search-summary"
   data-search-dialog
-  data-search-index={withBase("/search-index.json")}
+  data-search-index={withBase(localizedPath(locale, "/search-index.json"))}
 >
   <div class="search-panel" data-search-panel data-empty>
-    <form action={withBase("/search/")} method="get" role="search" aria-label="站内搜索">
+    <form action={withBase(localizedPath(locale, "/search/"))} method="get" role="search" aria-label={copy.search.form}>
       <div class="search-field">
         <svg aria-hidden="true" class="search-field-icon" viewBox="0 0 24 24" fill="none">
           <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.75" />
           <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
         </svg>
-        <h2 id="site-search-title" class="sr-only">搜索 {siteConfig.name}</h2>
-        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <h2 id="site-search-title" class="sr-only">{copy.search.site} {siteConfig.name}</h2>
+        <label class="sr-only" for="site-search-input">{copy.search.posts}</label>
         <input
           id="site-search-input"
           name="q"
           type="search"
           class="search-input"
-          placeholder="搜索文章、分类、作者…"
+          placeholder={copy.search.placeholder}
           autocomplete="off"
           enterkeyhint="search"
           data-search-input
         />
-        <button type="button" class="icon-btn shrink-0" aria-label="关闭搜索" data-search-close>
+        <button type="button" class="icon-btn shrink-0" aria-label={copy.search.close} data-search-close>
           <svg aria-hidden="true" class="h-[1.1rem] w-[1.1rem]" viewBox="0 0 24 24" fill="none">
             <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
           </svg>
@@ -136,10 +206,10 @@ const isCurrentPath = (href: string) =>
       </div>
 
       <div class="search-foot" aria-hidden="true">
-        <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
-        <span><kbd>↵</kbd> 打开</span>
-        <span><kbd data-search-shortcut>Ctrl K</kbd> 搜索</span>
-        <span class="ml-auto hidden sm:inline">按回车查看全部结果</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> {copy.search.select}</span>
+        <span><kbd>↵</kbd> {copy.search.open}</span>
+        <span><kbd data-search-shortcut>Ctrl K</kbd> {copy.search.shortcut}</span>
+        <span class="ml-auto hidden sm:inline">{copy.search.enterForAll}</span>
       </div>
     </form>
   </div>
@@ -150,19 +220,19 @@ const isCurrentPath = (href: string) =>
   class="mobile-menu-panel md:hidden"
   role="dialog"
   aria-modal="true"
-  aria-label="导航菜单"
+  aria-label={copy.nav.menu}
   hidden
 >
   <div class="flex items-center justify-between gap-6 border-b border-border px-6 py-4">
-    <a href={withBase("/")} class="wordmark">{siteConfig.name}</a>
-    <button type="button" class="icon-btn" data-mobile-menu-close aria-label="关闭导航菜单">
+    <a href={withBase(localizedPath(locale, "/"))} class="wordmark">{siteConfig.name}</a>
+    <button type="button" class="icon-btn" data-mobile-menu-close aria-label={copy.nav.closeMenu}>
       <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
         <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
       </svg>
     </button>
   </div>
 
-  <nav class="px-6 py-4" aria-label="移动端导航">
+  <nav class="px-6 py-4" aria-label={copy.nav.mobile}>
     <ul>
       {
         navigation.map((item) => (
@@ -182,6 +252,7 @@ const isCurrentPath = (href: string) =>
 </div>
 
 <script is:inline type="application/json" id="site-search-fallback" set:html={JSON.stringify(searchFallback)} />
+<script is:inline type="application/json" id="site-search-copy" set:html={JSON.stringify(searchCopy)} />
 
 <script is:inline>
   (() => {
@@ -195,6 +266,7 @@ const isCurrentPath = (href: string) =>
     const summary = dialog?.querySelector("[data-search-summary]");
     const panel = dialog?.querySelector("[data-search-panel]");
     const fallback = JSON.parse(document.getElementById("site-search-fallback")?.textContent || "[]");
+    const searchCopy = JSON.parse(document.getElementById("site-search-copy")?.textContent || "{}");
     let index = [];
     let indexPromise;
 
@@ -284,12 +356,17 @@ const isCurrentPath = (href: string) =>
         .slice(0, 7)
         .map(({ item }) => item);
 
-      heading.textContent = "搜索结果";
-      summary.textContent = `找到 ${matches.length} 条与「${raw}」相关的结果`;
+      heading.textContent = searchCopy.results || "";
+      summary.textContent =
+        searchCopy.locale === "en"
+          ? `${matches.length} ${matches.length === 1 ? searchCopy.resultSingular : searchCopy.resultPlural} for “${raw}”`
+          : searchCopy.locale === "ja"
+            ? `「${raw}」の検索結果：${matches.length}件`
+            : `找到 ${matches.length} 条与「${raw}」相关的结果`;
       results.innerHTML =
         matches.length > 0
           ? matches.map(resultMarkup).join("")
-          : `<p class="search-empty">没有找到相关文章。试试其他标题、主题或作者。</p>`;
+          : `<p class="search-empty">${escapeHtml(searchCopy.noResults || "")}</p>`;
     };
 
     const open = () => {
@@ -359,6 +436,52 @@ const isCurrentPath = (href: string) =>
       if (dialog?.open && isCommandShortcut) close();
       else open();
     });
+
+    const languageMenu = document.querySelector("[data-language-menu]");
+    const languageToggle = languageMenu?.querySelector("[data-language-toggle]");
+    const languagePopover = languageMenu?.querySelector("[data-language-popover]");
+
+    if (languageMenu && languageToggle && languagePopover) {
+      const setLanguageMenuOpen = (isOpen) => {
+        languagePopover.hidden = !isOpen;
+        languageToggle.setAttribute("aria-expanded", String(isOpen));
+      };
+
+      languageToggle.addEventListener("click", () => {
+        setLanguageMenuOpen(languageToggle.getAttribute("aria-expanded") !== "true");
+      });
+
+      languagePopover.querySelectorAll("[data-language-link]").forEach((link) => {
+        // Preserve the current query and hash when switching an equivalent page.
+        const href = link.getAttribute("href");
+        if (href) link.setAttribute("href", `${href}${window.location.search}${window.location.hash}`);
+        link.addEventListener("click", () => setLanguageMenuOpen(false));
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!languageMenu.contains(event.target)) setLanguageMenuOpen(false);
+      });
+
+      languageMenu.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          setLanguageMenuOpen(false);
+          languageToggle.focus();
+          return;
+        }
+
+        if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+        const links = Array.from(languagePopover.querySelectorAll("a"));
+        if (links.length === 0) return;
+        event.preventDefault();
+        if (languagePopover.hidden) setLanguageMenuOpen(true);
+        const current = links.indexOf(document.activeElement);
+        const next =
+          event.key === "ArrowDown"
+            ? links[(current + 1 + links.length) % links.length]
+            : links[(current - 1 + links.length) % links.length];
+        next?.focus();
+      });
+    }
 
     const header = document.querySelector(".site-header");
 
@@ -476,6 +599,99 @@ const isCurrentPath = (href: string) =>
 </script>
 
 <style>
+  .language-menu {
+    position: relative;
+  }
+
+  .language-trigger {
+    display: inline-flex;
+    height: 2.25rem;
+    align-items: center;
+    gap: 0.35rem;
+    border: 0;
+    background: transparent;
+    color: var(--foreground);
+    cursor: pointer;
+    padding: 0 0.45rem;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    border-radius: var(--radius-sm);
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  .language-trigger:hover,
+  .language-trigger:focus-visible,
+  .language-trigger[aria-expanded="true"] {
+    background: var(--muted);
+    color: var(--accent);
+  }
+
+  .language-trigger > svg:first-child {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .language-chevron {
+    width: 0.65rem;
+    height: 0.65rem;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .language-trigger[aria-expanded="true"] .language-chevron {
+    transform: rotate(180deg);
+  }
+
+  .language-popover {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    right: 0;
+    z-index: 80;
+    width: max-content;
+    min-width: 9.5rem;
+    border: 1px solid var(--border);
+    background: var(--card);
+    padding: 0.35rem;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 14px 35px rgb(0 0 0 / 18%);
+  }
+
+  .language-popover[hidden] {
+    display: none;
+  }
+
+  .language-popover a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.65rem;
+    color: var(--foreground);
+    font-size: 0.82rem;
+    text-decoration: none;
+    border-radius: var(--radius-xs);
+  }
+
+  .language-popover a:hover,
+  .language-popover a:focus-visible {
+    background: var(--muted);
+    color: var(--accent);
+    outline: none;
+  }
+
+  .language-popover a[aria-current="true"] {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .language-popover a svg {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
   .search-dialog {
     position: fixed;
     inset: 0;

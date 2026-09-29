@@ -16,6 +16,8 @@ const content = `---
 title: "在这里填写文章标题"
 excerpt: "用一两句话介绍这篇文章。"
 category: "随笔"
+language: "zh-CN"
+translationKey: "${slug}"
 date: ${new Date().toISOString()}
 author:
   name: "Hong Huang"

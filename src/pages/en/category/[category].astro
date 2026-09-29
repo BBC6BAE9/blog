@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+import CategoryPage from "@/views/CategoryPage.astro";
+import {
+  categories,
+  categorySlug,
+  getPostsByCategory,
+  visiblePosts,
+  type Category,
+  type Post,
+} from "@/lib/posts";
+
+export async function getStaticPaths() {
+  const allPosts = visiblePosts(await getCollection("posts"), "en");
+  return categories
+    .filter((category) => getPostsByCategory(allPosts, category).length > 0)
+    .map((category) => ({
+      params: { category: categorySlug(category) },
+      props: { category, allPosts },
+    }));
+}
+
+interface Props {
+  category: Category;
+  allPosts: Post[];
+}
+
+const { category, allPosts } = Astro.props;
+---
+
+<CategoryPage locale="en" category={category} allPosts={allPosts} />

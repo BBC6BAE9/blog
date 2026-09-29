@@ -1,0 +1,46 @@
+---
+import { withBase } from "@/lib/urls";
+import PostCard from "@/components/PostCard.astro";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { categoryDescription, categoryLabel, type Category } from "@/config/categories";
+import { siteConfig } from "@/config/site";
+import { getMessages, localizedPath, type Locale } from "@/i18n";
+import { getPostsByCategory, type Post } from "@/lib/posts";
+
+interface Props {
+  locale: Locale;
+  category: Category;
+  allPosts: Post[];
+}
+
+const { locale, category, allPosts } = Astro.props;
+const copy = getMessages(locale).category;
+const posts = getPostsByCategory(allPosts, category);
+const label = categoryLabel(category, locale);
+const description = categoryDescription(category, locale);
+---
+
+<BaseLayout locale={locale} title={label} description={`${description} ${copy.postCount(posts.length)} · ${siteConfig.name}`}>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h1 class="pagehead-title">{label}</h1>
+        <p class="pagehead-description">{description}</p>
+        <p class="meta mt-5"><span>{copy.postCount(posts.length)}</span></p>
+      </header>
+
+      <div class="feed">
+        {posts.map((post) => <PostCard post={post} locale={locale} />)}
+      </div>
+
+      <a href={withBase(localizedPath(locale, "/categories/"))} class="btn btn-outline btn-block mt-16">
+        {copy.all}
+      </a>
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+</BaseLayout>

@@ -1,0 +1,42 @@
+---
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { siteConfig } from "@/config/site";
+import { getMessages, type Locale } from "@/i18n";
+import { visiblePosts } from "@/lib/posts";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getMessages(locale).contact;
+const allPosts = visiblePosts(await getCollection("posts"), locale);
+---
+
+<BaseLayout locale={locale} title={copy.title} description={copy.description}>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h1 class="pagehead-title">{copy.heading}</h1>
+        <p class="pagehead-description">{copy.intro}</p>
+      </header>
+      <div class="prose">
+        <h2>Email</h2>
+        <p>{copy.emailBody}</p>
+        <p><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></p>
+        <h2>GitHub</h2>
+        <p>{copy.githubBody}</p>
+        <p><a href="https://github.com/BBC6BAE9">github.com/BBC6BAE9</a></p>
+        <h2>X</h2>
+        <p><a href="https://x.com/Bae9Bbc6">@Bae9Bbc6</a></p>
+      </div>
+      <a href={`mailto:${siteConfig.email}`} class="btn btn-solid mt-8">{copy.emailMe}</a>
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+</BaseLayout>

@@ -1,0 +1,22 @@
+---
+import { getCollection } from "astro:content";
+import AuthorPage from "@/views/AuthorPage.astro";
+import { getAllAuthors, visiblePosts, type Post } from "@/lib/posts";
+
+export async function getStaticPaths() {
+  const allPosts = visiblePosts(await getCollection("posts"), "en");
+  return getAllAuthors(allPosts).map((author) => ({
+    params: { author: author.slug },
+    props: { author, allPosts },
+  }));
+}
+
+interface Props {
+  author: { slug: string; name: string; role: string; posts: Post[] };
+  allPosts: Post[];
+}
+
+const { author, allPosts } = Astro.props;
+---
+
+<AuthorPage locale="en" author={author} allPosts={allPosts} />

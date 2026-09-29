@@ -1,5 +1,11 @@
-<div class="code-group" data-code-group>
-  <div class="code-group-tabs" role="tablist" aria-label="代码示例"></div>
+---
+import { getMessages, localeFromPath } from "@/i18n";
+
+const copy = getMessages(localeFromPath(Astro.url.pathname)).callout;
+---
+
+<div class="code-group" data-code-group data-example-label={copy.example(0).replace(/0$/, "")}>
+  <div class="code-group-tabs" role="tablist" aria-label={copy.codeExamples}></div>
   <div class="code-group-panels">
     <slot />
   </div>
@@ -117,7 +123,7 @@
     if (panels.length < 2) return;
 
     const tabs: HTMLButtonElement[] = panels.map((panel, index) => {
-      const label = panel.getAttribute("data-code-tab-label") || `示例 ${index + 1}`;
+      const label = panel.getAttribute("data-code-tab-label") || `${group.dataset.exampleLabel || "Example "}${index + 1}`;
       const tabId = `${groupId}-tab-${index}`;
       const panelId = `${groupId}-panel-${index}`;
 
