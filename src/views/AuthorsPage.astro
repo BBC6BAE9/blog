@@ -1,0 +1,46 @@
+---
+import { withBase } from "@/lib/urls";
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getMessages, localizedPath, type Locale } from "@/i18n";
+import { getAllAuthors, visiblePosts } from "@/lib/posts";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getMessages(locale).author;
+const allPosts = visiblePosts(await getCollection("posts"), locale);
+const authors = getAllAuthors(allPosts);
+---
+
+<BaseLayout locale={locale} title={copy.title} description={copy.description}>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">{copy.archiveEyebrow}</p>
+        <h1 class="pagehead-title">{copy.title}</h1>
+        <p class="pagehead-description">{copy.intro}</p>
+      </header>
+
+      <ul class="grid gap-5">
+        {authors.map((author) => (
+          <li class="border-b border-border pb-5 last:border-b-0">
+            <a href={withBase(localizedPath(locale, `/author/${author.slug}/`))} class="link-title flex items-baseline justify-between gap-4">
+              <span>
+                <span class="link-title__text block text-xl font-semibold tracking-tight">{author.name}</span>
+                <span class="mt-1 block text-sm text-muted-foreground">{author.role}</span>
+              </span>
+              <span class="pill shrink-0">{copy.postCount(author.posts.length)}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+</BaseLayout>

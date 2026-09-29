@@ -18,9 +18,20 @@ export default defineConfig({
   site: siteConfig.siteUrl,
   base: "/",
   trailingSlash: "always",
+  i18n: {
+    locales: ["zh-CN", "en", "ja"],
+    defaultLocale: "zh-CN",
+    routing: {
+      prefixDefaultLocale: false,
+      redirectToDefaultLocale: false,
+    },
+  },
   integrations: [
     sitemap({
-      filter: (page) => page !== new URL("search/", siteConfig.siteUrl).toString(),
+      filter: (page) => {
+        const pathname = new URL(page).pathname;
+        return !pathname.endsWith("/search/") && !pathname.endsWith("/404/");
+      },
     }),
     mdx(),
   ],

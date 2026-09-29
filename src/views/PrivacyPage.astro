@@ -1,0 +1,73 @@
+---
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { siteConfig } from "@/config/site";
+import { getMessages, localizedPath, type Locale } from "@/i18n";
+import { visiblePosts } from "@/lib/posts";
+import { withBase } from "@/lib/urls";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getMessages(locale).privacy;
+const allPosts = visiblePosts(await getCollection("posts"), locale);
+---
+
+<BaseLayout locale={locale} title={copy.title} description={copy.description}>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h1 class="pagehead-title">{copy.title}</h1>
+        <p class="pagehead-description">{copy.intro}</p>
+      </header>
+
+      {locale === "zh-CN" ? (
+        <div class="prose">
+          <h2>浏览本站</h2>
+          <p>本站是托管在 GitHub Pages 上的静态博客，阅读文章不需要注册账号。本站没有主动加入广告追踪或流量统计脚本；托管服务的相关数据处理请参阅 <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub 隐私声明</a>。</p>
+          <h2>阅读偏好</h2>
+          <p>你选择的浅色或深色模式会保存在当前浏览器的本地存储中，用于记住阅读偏好。语言选择由页面地址表示，不使用额外的追踪数据。可以通过清除本站的浏览器数据重置阅读模式。</p>
+          <h2>文章评论</h2>
+          <p>评论通过 giscus 和 GitHub Discussions 提供。加载评论时会连接相关服务；发表评论需要登录 GitHub，评论会公开显示在对应的讨论中。请不要在评论里留下密码或其他敏感信息。</p>
+          <h2>订阅更新</h2>
+          <p><a href={withBase(localizedPath(locale, "/rss.xml"))}>RSS 订阅</a>不需要向本站提供邮箱。邮件订阅由 follow.it 处理邮箱信息、发送文章更新并提供退订功能。免费邮件可能包含该服务的推荐内容；请在提交邮箱前阅读其<a href="https://follow.it/info/privacy" target="_blank" rel="noopener noreferrer">隐私政策</a>。</p>
+          <h2>联系</h2>
+          <p>关于本站的隐私问题，可以写信到 <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>。</p>
+        </div>
+      ) : locale === "ja" ? (
+        <div class="prose">
+          <h2>このサイトの閲覧</h2>
+          <p>このサイトは GitHub Pages でホストされている静的ブログです。記事を読むためのアカウント登録は不要で、広告トラッカーやアクセス解析スクリプトも追加していません。ホスティングサービスによるデータの取り扱いについては、<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub プライバシー ステートメント</a>をご確認ください。</p>
+          <h2>閲覧設定</h2>
+          <p>ライトモードまたはダークモードの選択は、このブラウザのローカルストレージに保存されます。言語はページの URL で表され、追加の追跡データは使用しません。このサイトのブラウザデータを消去すると、閲覧モードをリセットできます。</p>
+          <h2>コメント</h2>
+          <p>コメントには giscus と GitHub Discussions を使用しています。コメントを読み込むと各サービスに接続します。投稿には GitHub アカウントが必要で、コメントは対応する Discussion に公開されます。パスワードなどの機密情報は投稿しないでください。</p>
+          <h2>更新の購読</h2>
+          <p><a href={withBase(localizedPath(locale, "/rss.xml"))}>RSS フィード</a>の購読にメールアドレスは不要です。メール購読は follow.it がメールアドレスを処理し、更新の配信と購読解除機能を提供します。無料メールには同サービスのおすすめが含まれる場合があります。購読前に<a href="https://follow.it/info/privacy" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>をご確認ください。</p>
+          <h2>お問い合わせ</h2>
+          <p>このサイトのプライバシーに関するご質問は、<a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a> までメールでお寄せください。</p>
+        </div>
+      ) : (
+        <div class="prose">
+          <h2>Browsing this site</h2>
+          <p>This is a static blog hosted on GitHub Pages. You do not need an account to read it, and the site does not add advertising trackers or analytics scripts. See the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub Privacy Statement</a> for information about the hosting service.</p>
+          <h2>Reading preferences</h2>
+          <p>Your light or dark reading mode is stored in this browser’s local storage. The language is represented by the page URL and does not require additional tracking data. Clear this site’s browser data to reset the reading mode.</p>
+          <h2>Comments</h2>
+          <p>Comments are provided by giscus and GitHub Discussions. Loading them connects to those services. Posting requires a GitHub account, and comments are publicly visible in the corresponding discussion. Do not post passwords or other sensitive information.</p>
+          <h2>Subscriptions</h2>
+          <p><a href={withBase(localizedPath(locale, "/rss.xml"))}>The RSS feed</a> does not require your email address. Email subscriptions are handled by follow.it, which processes your address, sends updates, and provides unsubscribe controls. Free emails may contain recommendations from that service. Read its <a href="https://follow.it/info/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> before subscribing.</p>
+          <h2>Contact</h2>
+          <p>For privacy questions about this site, email <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.</p>
+        </div>
+      )}
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+</BaseLayout>

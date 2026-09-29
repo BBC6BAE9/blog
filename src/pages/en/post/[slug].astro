@@ -1,0 +1,22 @@
+---
+import { getCollection } from "astro:content";
+import PostPage from "@/pages/post/[slug].astro";
+import { postSlug, visiblePosts, type Post } from "@/lib/posts";
+
+export async function getStaticPaths() {
+  const allPosts = visiblePosts(await getCollection("posts"), "en");
+  return allPosts.map((post) => ({
+    params: { slug: postSlug(post) },
+    props: { post, allPosts },
+  }));
+}
+
+interface Props {
+  post: Post;
+  allPosts: Post[];
+}
+
+const { post, allPosts } = Astro.props;
+---
+
+<PostPage post={post} allPosts={allPosts} locale="en" />

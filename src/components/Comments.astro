@@ -1,19 +1,23 @@
 ---
 import { siteConfig } from "@/config/site";
+import { defaultLocale, getMessages, type Locale } from "@/i18n";
 interface Props {
   discussionTerm: string;
+  locale?: Locale;
 }
-const comments = { ...siteConfig.comments, term: Astro.props.discussionTerm };
+const locale = Astro.props.locale ?? defaultLocale;
+const copy = getMessages(locale).comments;
+const comments = { ...siteConfig.comments, term: Astro.props.discussionTerm, locale };
 ---
 {comments.enabled && (
   <section id="comments" class="canvas mt-16 border-t border-border pt-8" aria-labelledby="comments-heading">
-    <h2 id="comments-heading" class="section-title">评论与交流</h2>
+    <h2 id="comments-heading" class="section-title">{copy.heading}</h2>
     <p class="mb-6 text-sm leading-relaxed text-muted-foreground">
-      欢迎讨论。使用 GitHub 账号参与，评论公开保存在这个博客的 Discussions 中。
-      <a class="link-sweep" href={`https://github.com/${comments.repo}/discussions`} target="_blank" rel="noopener noreferrer">在 GitHub 打开</a>
+      {copy.intro}{" "}
+      <a class="link-sweep" href={`https://github.com/${comments.repo}/discussions`} target="_blank" rel="noopener noreferrer">{copy.openGitHub}</a>
     </p>
     <div class="giscus" data-comment-config={JSON.stringify(comments)}></div>
-    <noscript><p>请前往 GitHub Discussions 阅读和发表评论。</p></noscript>
+    <noscript><p>{copy.noScript}</p></noscript>
   </section>
 )}
 <script>
@@ -37,7 +41,7 @@ const comments = { ...siteConfig.comments, term: Astro.props.discussionTerm };
       "data-emit-metadata": "0",
       "data-input-position": "top",
       "data-theme": theme(),
-      "data-lang": "zh-CN",
+      "data-lang": config.locale,
       "data-loading": "lazy",
     };
     for (const [key, value] of Object.entries(attributes)) script.setAttribute(key, value);

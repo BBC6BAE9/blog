@@ -1,0 +1,143 @@
+---
+import { withBase } from "@/lib/urls";
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { categoryLabel } from "@/config/categories";
+import { getMessages, localizedPath, type Locale } from "@/i18n";
+import { formatDate, postHref, readingLabel, visiblePosts } from "@/lib/posts";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getMessages(locale).search;
+const allPosts = visiblePosts(await getCollection("posts"), locale);
+const searchItems = allPosts.map((post) => ({
+  title: post.data.title,
+  excerpt: post.data.excerpt,
+  href: withBase(postHref(post, locale)),
+  author: post.data.author.name,
+  category: categoryLabel(post.data.category, locale),
+  date: formatDate(post.data.date, locale),
+  reading: readingLabel(post, locale),
+}));
+const searchPageCopy = { locale, noResults: copy.noResults };
+---
+
+<BaseLayout locale={locale} title={copy.title} description={copy.description} noindex>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">{copy.title}</p>
+        <h1 class="pagehead-title">{copy.posts}</h1>
+
+        <form class="mt-8" role="search" aria-label={copy.posts} action={withBase(localizedPath(locale, "/search/"))} method="get">
+          <label class="sr-only" for="search-page-input">{copy.posts}</label>
+          <div class="flex gap-2">
+            <input
+              id="search-page-input"
+              name="q"
+              type="search"
+              class="field"
+              placeholder={copy.pagePlaceholder}
+              autocomplete="off"
+              data-search-page-input
+            />
+            <button type="submit" class="btn btn-solid shrink-0">{copy.submit}</button>
+          </div>
+        </form>
+
+        <p class="search-page-summary mt-4 text-sm text-muted-foreground" data-search-page-summary></p>
+      </header>
+
+      <div class="feed" data-search-page-results></div>
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+
+  <script is:inline type="application/json" id="search-page-data" set:html={JSON.stringify(searchItems)} />
+  <script is:inline type="application/json" id="search-page-copy" set:html={JSON.stringify(searchPageCopy)} />
+  <script is:inline>
+    (() => {
+      const input = document.querySelector("[data-search-page-input]");
+      const results = document.querySelector("[data-search-page-results]");
+      const summary = document.querySelector("[data-search-page-summary]");
+      const items = JSON.parse(document.getElementById("search-page-data")?.textContent || "[]");
+      const copy = JSON.parse(document.getElementById("search-page-copy")?.textContent || "{}");
+
+      if (!input || !results || !summary) return;
+
+      const escapeHtml = (value) =>
+        String(value).replace(/[&<>"']/g, (character) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[character]);
+
+      const matches = (item, query) =>
+        [item.title, item.excerpt, item.author, item.category].join(" ").toLowerCase().includes(query);
+
+      const render = () => {
+        const raw = input.value.trim();
+        const query = raw.toLowerCase();
+        const found = query ? items.filter((item) => matches(item, query)) : [];
+
+        summary.textContent = query
+          ? copy.locale === "en"
+            ? `${found.length} ${found.length === 1 ? "result" : "results"} for “${raw}”`
+            : copy.locale === "ja"
+              ? `「${raw}」の検索結果：${found.length}件`
+              : `找到 ${found.length} 条与「${raw}」相关的结果`
+          : "";
+
+        results.innerHTML = found.length > 0
+          ? found.map((item) => `
+              <article>
+                <a href="${escapeHtml(item.href)}" class="link-title">
+                  <h2 class="search-page-title link-title__text">${escapeHtml(item.title)}</h2>
+                  <p class="search-page-excerpt">${escapeHtml(item.excerpt)}</p>
+                  <p class="meta mt-4"><span class="meta-accent">${escapeHtml(item.category)}</span><time>${escapeHtml(item.date)}</time><span>${escapeHtml(item.reading)}</span></p>
+                </a>
+              </article>
+            `).join("")
+          : query
+            ? `<p class="text-muted-foreground">${escapeHtml(copy.noResults || "")}</p>`
+            : "";
+      };
+
+      input.value = new URLSearchParams(window.location.search).get("q") || "";
+      render();
+      input.addEventListener("input", render);
+    })();
+  </script>
+
+  <style is:global>
+    .search-page-summary:empty {
+      display: none;
+    }
+
+    .search-page-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.2vw, 1.875rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+
+    .search-page-excerpt {
+      margin: 0.75rem 0 0;
+      color: color-mix(in srgb, var(--foreground) 88%, transparent);
+      font-size: 1.0625rem;
+      line-height: 1.55;
+      text-wrap: pretty;
+    }
+  </style>
+</BaseLayout>

@@ -1,0 +1,19 @@
+---
+import { getCollection } from "astro:content";
+import type { GetStaticPaths, Page } from "astro";
+import PostsPage from "@/views/PostsPage.astro";
+import { visiblePosts, type Post } from "@/lib/posts";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = visiblePosts(await getCollection("posts"), "ja");
+  return paginate(posts, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<Post>;
+}
+
+const { page } = Astro.props;
+---
+
+<PostsPage locale="ja" page={page} />

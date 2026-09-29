@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getMessages, type Locale } from "@/i18n";
+import { visiblePosts } from "@/lib/posts";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getMessages(locale);
+const allPosts = visiblePosts(await getCollection("posts"), locale);
+---
+
+<BaseLayout locale={locale} title={copy.about.title} description={copy.site.about}>
+  <SiteHeader posts={allPosts} locale={locale} />
+  <main id="content" class="outer">
+    <div class="canvas">
+      <header class="pagehead">
+        <p class="eyebrow">{copy.about.title}</p>
+        <h1 class="pagehead-title">{copy.about.name}</h1>
+        <p class="pagehead-description">{copy.site.about}</p>
+      </header>
+    </div>
+  </main>
+  <SiteFooter locale={locale} />
+</BaseLayout>

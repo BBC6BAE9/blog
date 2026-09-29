@@ -11,7 +11,9 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Callout from "@/components/mdx/Callout.astro";
 import CodeGroup from "@/components/mdx/CodeGroup.astro";
 import CodeGroupItem from "@/components/mdx/CodeGroupItem.astro";
+import { categoryLabel } from "@/config/categories";
 import { siteConfig } from "@/config/site";
+import { defaultLocale, getMessages, localizedPath, type Locale } from "@/i18n";
 import {
   authorSlug,
   categoryHref,
@@ -27,7 +29,7 @@ import {
 } from "@/lib/posts";
 
 export async function getStaticPaths() {
-  const allPosts = visiblePosts(await getCollection("posts"));
+  const allPosts = visiblePosts(await getCollection("posts"), "zh-CN");
   return allPosts.map((post) => ({
     params: { slug: postSlug(post) },
     props: { post, allPosts },
@@ -37,16 +39,18 @@ export async function getStaticPaths() {
 interface Props {
   post: Post;
   allPosts: Post[];
+  locale?: Locale;
 }
 
-const { post, allPosts } = Astro.props;
+const { post, allPosts, locale = defaultLocale } = Astro.props;
+const copy = getMessages(locale).post;
 const { Content } = await render(post);
 const mdxComponents = { Callout, CodeGroup, CodeGroupItem };
 const data = post.data;
 const related = getRelated(allPosts, post);
 const { newer, older } = getAdjacent(allPosts, post);
-const authorHref = `/author/${authorSlug(data.author.name)}/`;
-const articleUrl = new URL(withBase(postHref(post)), siteConfig.siteUrl).toString();
+const authorHref = localizedPath(locale, `/author/${authorSlug(data.author.name)}/`);
+const articleUrl = new URL(withBase(postHref(post, locale)), siteConfig.siteUrl).toString();
 const socialImage = data.cover
   ? new URL(withBase(data.cover.src.src), siteConfig.siteUrl).toString()
   : new URL(withBase(siteConfig.socialImage), siteConfig.siteUrl).toString();
@@ -73,7 +77,7 @@ const structuredData = {
   "@context": "https://schema.org",
   "@type": "Article",
   headline: data.title,
-  inLanguage: data.language ?? siteConfig.language,
+  inLanguage: data.language,
   description: data.excerpt,
   image: socialImage,
   datePublished: data.date.toISOString(),
@@ -82,27 +86,35 @@ const structuredData = {
   publisher: { "@type": "Person", name: siteConfig.authorName },
   mainEntityOfPage: articleUrl,
 };
+const copyLabels = {
+  linkCopied: copy.linkCopied,
+  copyFailed: copy.copyFailed,
+  copy: copy.copy,
+  copied: copy.copied,
+  codeCopied: copy.codeCopied,
+};
 ---
 
 <BaseLayout
+  locale={locale}
   title={data.title}
   description={data.excerpt}
   image={socialImage}
   type="article"
   structuredData={structuredData}
 >
-  <SiteHeader posts={allPosts} />
+  <SiteHeader posts={allPosts} locale={locale} />
   <main id="content" class="outer">
-    <article lang={data.language ?? siteConfig.language}>
+    <article lang={data.language}>
       <header class="canvas pt-10 md:pt-14">
         <p class="meta post-meta">
           <span class="post-meta__byline">
             <a href={withBase(authorHref)} class="link-sweep post-meta__link">{data.author.name}</a> ·{" "}
-            <a href={withBase(categoryHref(data.category))} class="link-sweep post-meta__link">{data.category}</a>
+            <a href={withBase(categoryHref(data.category, locale))} class="link-sweep post-meta__link">{categoryLabel(data.category, locale)}</a>
           </span>
           <span class="post-meta__dates">
-            <span class="meta-accent"><time datetime={data.date.toISOString()}>{formatDate(data.date, "long")}</time></span>
-            <span>{readingLabel(post)}</span>
+            <span class="meta-accent"><time datetime={data.date.toISOString()}>{formatDate(data.date, locale, "long")}</time></span>
+            <span>{readingLabel(post, locale)}</span>
           </span>
         </p>
 
@@ -111,19 +123,19 @@ const structuredData = {
 
         {data.updatedDate && (
           <p class="meta mt-5">
-            <span>更新于 <time datetime={data.updatedDate.toISOString()}>{formatDate(data.updatedDate)}</time></span>
+            <span>{copy.updated} <time datetime={data.updatedDate.toISOString()}>{formatDate(data.updatedDate, locale)}</time></span>
           </p>
         )}
 
         <div class="mt-8 flex flex-wrap items-center gap-2 border-t border-border pt-6" role="group" aria-labelledby="share-heading">
-          <h2 id="share-heading" class="eyebrow mr-1">分享</h2>
+          <h2 id="share-heading" class="eyebrow mr-1">{copy.share}</h2>
           {shareLinks.map((link) => (
             <a
               href={link.href}
               target="_blank"
               rel="noreferrer"
               class="share-btn"
-              aria-label={`分享到 ${link.label}：${data.title}`}
+              aria-label={copy.shareTo(link.label, data.title)}
             >
               <LocalIcon name={link.icon} className="h-4 w-4" />
             </a>
@@ -133,7 +145,7 @@ const structuredData = {
             class="share-btn"
             data-copy-link
             data-copy-url={articleUrl}
-            aria-label={`复制文章链接：${data.title}`}
+            aria-label={copy.copyLink(data.title)}
           >
             <LocalIcon name="link-45deg" className="h-4 w-4" />
           </button>
@@ -170,16 +182,16 @@ const structuredData = {
         <Content components={mdxComponents} />
       </div>
 
-      <Comments discussionTerm={postIdentity(post)} />
+      <Comments discussionTerm={postIdentity(post)} locale={locale} />
 
       {(newer || older) && (
         <footer class="canvas mt-16 border-t border-border pt-8">
-          <nav class="grid gap-8 sm:grid-cols-2" aria-label="文章导航">
+          <nav class="grid gap-8 sm:grid-cols-2" aria-label={copy.navigation}>
             <div>
               {older && (
-                <a href={withBase(postHref(older))} class="link-title link-nudge">
+                <a href={withBase(postHref(older, locale))} class="link-title link-nudge">
                   <span class="eyebrow">
-                    <span class="link-nudge__arrow link-nudge__arrow--prev">&larr;</span> 上一篇
+                    <span class="link-nudge__arrow link-nudge__arrow--prev">&larr;</span> {copy.previous}
                   </span>
                   <span class="link-title__text mt-2 block font-semibold leading-snug">{older.data.title}</span>
                 </a>
@@ -187,9 +199,9 @@ const structuredData = {
             </div>
             <div class="sm:text-right">
               {newer && (
-                <a href={withBase(postHref(newer))} class="link-title link-nudge">
+                <a href={withBase(postHref(newer, locale))} class="link-title link-nudge">
                   <span class="eyebrow">
-                    下一篇 <span class="link-nudge__arrow link-nudge__arrow--next">&rarr;</span>
+                    {copy.next} <span class="link-nudge__arrow link-nudge__arrow--next">&rarr;</span>
                   </span>
                   <span class="link-title__text mt-2 block font-semibold leading-snug">{newer.data.title}</span>
                 </a>
@@ -202,16 +214,19 @@ const structuredData = {
 
     {related.length > 0 && (
       <section class="canvas mt-[var(--space-section)]" aria-labelledby="keep-reading">
-        <h2 id="keep-reading" class="section-title">继续阅读</h2>
+        <h2 id="keep-reading" class="section-title">{copy.keepReading}</h2>
         <div class="grid gap-7">
-          {related.map((item) => <PostCard post={item} variant="compact" headingLevel="h3" />)}
+          {related.map((item) => <PostCard post={item} locale={locale} variant="compact" headingLevel="h3" />)}
         </div>
       </section>
     )}
   </main>
-  <SiteFooter />
+  <SiteFooter locale={locale} />
+
+  <script is:inline type="application/json" id="post-copy-labels" set:html={JSON.stringify(copyLabels)} />
 
   <script is:inline>
+    const copyLabels = JSON.parse(document.getElementById("post-copy-labels")?.textContent || "{}");
     document.querySelectorAll("[data-copy-link]").forEach((button) => {
       const status = button.parentElement?.querySelector("[data-copy-status]");
 
@@ -222,9 +237,9 @@ const structuredData = {
         try {
           if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
           await navigator.clipboard.writeText(url);
-          if (status) status.textContent = "链接已复制";
+          if (status) status.textContent = copyLabels.linkCopied || "";
         } catch {
-          if (status) status.textContent = "复制失败，请手动复制";
+          if (status) status.textContent = copyLabels.copyFailed || "";
         }
       });
     });
@@ -244,7 +259,7 @@ const structuredData = {
       button.type = "button";
       button.className = "code-copy-button";
       button.setAttribute("aria-describedby", labelId);
-      button.textContent = "复制";
+      button.textContent = copyLabels.copy || "Copy";
       liveRegion.id = labelId;
       liveRegion.className = "sr-only";
       liveRegion.setAttribute("aria-live", "polite");
@@ -256,14 +271,14 @@ const structuredData = {
         try {
           if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
           await navigator.clipboard.writeText(code?.textContent ?? pre.textContent ?? "");
-          button.textContent = "已复制";
-          liveRegion.textContent = "代码已复制";
+          button.textContent = copyLabels.copied || "Copied";
+          liveRegion.textContent = copyLabels.codeCopied || "Code copied";
         } catch {
-          button.textContent = "复制失败";
-          liveRegion.textContent = "复制失败，请手动复制";
+          button.textContent = copyLabels.copyFailed || "Copy failed";
+          liveRegion.textContent = copyLabels.copyFailed || "Copy failed";
         }
         window.setTimeout(() => {
-          button.textContent = "复制";
+          button.textContent = copyLabels.copy || "Copy";
         }, 1800);
       });
     });

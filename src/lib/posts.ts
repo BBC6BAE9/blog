@@ -1,7 +1,6 @@
 import type { CollectionEntry } from "astro:content";
 import { categories, categorySlug, type Category } from "@/config/categories";
-import { siteConfig } from "@/config/site";
-import { withBase } from "@/lib/urls";
+import { defaultLocale, getMessages, localeMeta, localizedPath, type Locale } from "@/i18n";
 
 export type Post = CollectionEntry<"posts">;
 export { categories, categorySlug, type Category };
@@ -14,11 +13,14 @@ export const authorSlug = (author: string) =>
     .trim()
     .replace(/\s+/g, "-");
 
-export const categoryHref = (category: string) => withBase(`/category/${categorySlug(category)}/`);
+export const categoryHref = (category: string, locale: Locale = defaultLocale) =>
+  localizedPath(locale, `/category/${categorySlug(category)}/`);
 
-export const postSlug = (post: Post) => post.id.replace(/\/index$/, "");
+export const postSlug = (post: Post) =>
+  post.data.translationKey ?? post.id.replace(/\/index(?:\.[^/]+)?$/, "");
 
-export const postHref = (post: Post) => withBase(`/post/${postSlug(post)}/`);
+export const postHref = (post: Post, locale: Locale = defaultLocale) =>
+  localizedPath(locale, `/post/${postSlug(post)}/`);
 
 /**
  * Stable identity from the original GitHub Pages publication namespace.
@@ -29,8 +31,15 @@ export const postIdentity = (post: Post) => `blog/post/${postSlug(post)}/`;
 
 export const byNewest = (a: Post, b: Post) => b.data.date.getTime() - a.data.date.getTime();
 
-export const visiblePosts = (posts: Post[]) =>
-  posts.filter((post) => !post.data.draft && post.data.date.getTime() <= Date.now()).sort(byNewest);
+export const visiblePosts = (posts: Post[], locale?: Locale) =>
+  posts
+    .filter(
+      (post) =>
+        !post.data.draft &&
+        post.data.date.getTime() <= Date.now() &&
+        (!locale || post.data.language === locale),
+    )
+    .sort(byNewest);
 
 /**
  * Reading time from the raw Markdown body at 220 words per minute, so posts
@@ -39,11 +48,16 @@ export const visiblePosts = (posts: Post[]) =>
 export const readingMinutes = (post: Post) => {
   const body = post.body ?? "";
   const chineseCharacters = body.match(/\p{Script=Han}/gu)?.length ?? 0;
-  const words = body.replace(/\p{Script=Han}/gu, " ").trim().split(/\s+/).filter(Boolean).length;
+  const words = body
+    .replace(/\p{Script=Han}/gu, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
   return Math.max(1, Math.ceil(chineseCharacters / 400 + words / 220));
 };
 
-export const readingLabel = (post: Post) => `${readingMinutes(post)} 分钟阅读`;
+export const readingLabel = (post: Post, locale: Locale = defaultLocale) =>
+  getMessages(locale).post.readingMinutes(readingMinutes(post));
 
 export const getFeatured = (posts: Post[], limit = 5) =>
   visiblePosts(posts)
@@ -106,8 +120,12 @@ export const getAllAuthors = (posts: Post[]) =>
     .map(([slug, author]) => ({ slug, ...author }))
     .sort((a, b) => b.posts.length - a.posts.length || a.name.localeCompare(b.name));
 
-export const formatDate = (date: Date, style: "short" | "long" = "short") =>
-  new Intl.DateTimeFormat(siteConfig.dateLocale, {
+export const formatDate = (
+  date: Date,
+  locale: Locale = defaultLocale,
+  style: "short" | "long" = "short",
+) =>
+  new Intl.DateTimeFormat(localeMeta[locale].dateLocale, {
     month: style === "short" ? "short" : "long",
     day: "numeric",
     year: "numeric",

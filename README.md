@@ -1,6 +1,6 @@
 # HONG HUANG
 
-基于 [Monograph](https://github.com/xocothemes/monograph) 的中文个人技术博客，使用 Astro 生成静态页面，通过 GitHub Actions 发布到 GitHub Pages。Cloudflare 管理自定义域名的 DNS，网站内容由 GitHub Pages 提供，无需自建服务器。
+基于 [Monograph](https://github.com/xocothemes/monograph) 的中英文个人技术博客，使用 Astro 生成静态页面，通过 GitHub Actions 发布到 GitHub Pages。Cloudflare 管理自定义域名的 DNS，网站内容由 GitHub Pages 提供，无需自建服务器。
 
 - 博客：[honghuang.foomansoft.com](https://honghuang.foomansoft.com/)
 - 作品集：[honghuang.foomansoft.com/portfolio/](https://honghuang.foomansoft.com/portfolio/)
@@ -43,6 +43,8 @@ npm run new-post -- swiftui-notes
 title: "我的 SwiftUI 笔记"
 excerpt: "这篇文章要解决什么问题。"
 category: "Apple 平台"
+language: "zh-CN"
+translationKey: "swiftui-notes"
 date: 2026-09-16T10:00:00+08:00
 author:
   name: "Hong Huang"
@@ -51,7 +53,9 @@ featured: false
 draft: false
 ```
 
-保留生成文件里的 `---` 分隔符。可选分类为 **Apple 平台、AI 与生成式 UI、工程实践、随笔**；`featured: true` 会加入精选文章。需要更新日期时，可以添加 `updatedDate` 字段。
+保留生成文件里的 `---` 分隔符。`language` 必须是 `zh-CN`、`en` 或 `ja`；`translationKey` 是不同语言版本共享的稳定文章地址；可选分类为 **Apple 平台、AI 与生成式 UI、工程实践、随笔**；`featured: true` 会加入精选文章。需要更新日期时，可以添加 `updatedDate` 字段。
+
+要为文章添加英文版或日文版，可以在同一目录新建 `index.en.md` 或 `index.ja.md`，将 `language` 分别改为 `en` 或 `ja`，同时保留完全相同的 `translationKey`、日期和分类，再翻译标题、摘要、正文、图片替代文本与图注。例如三个文件都使用 `translationKey: "swiftui-notes"`，最终地址分别是 `/post/swiftui-notes/`、`/en/post/swiftui-notes/` 和 `/ja/post/swiftui-notes/`。站点会按语言分别生成文章列表、搜索索引和 RSS。
 
 新文章默认为 `draft: true`，不会出现在网站或本地预览中。准备查看效果时，先在本地改为 `draft: false`，再运行 `npm run dev`。在提交前也可以改回草稿状态。文章图片可以放在同一目录，用 `![图片说明](./image.png)` 引用；需要组件时可使用 `.mdx`。
 
@@ -77,12 +81,15 @@ git push origin main
 | -------------------------- | -------------------------------------------- |
 | `src/config/site.ts`       | 博客名称、简介、社交链接、评论和邮件订阅配置 |
 | `src/config/categories.ts` | 分类名称、网址与介绍                         |
+| `src/i18n/index.ts`        | 中、英、日界面文案、语言信息与本地化路径     |
 | `src/pages/about.astro`    | 关于我                                       |
 | `src/pages/contact.astro`  | 联系方式                                     |
 | `src/pages/privacy.astro`  | 隐私说明                                     |
 | `src/styles/global.css`    | 字体、颜色与阅读样式                         |
 
 站点使用自定义域名 `honghuang.foomansoft.com` 的根路径 `/`。`src/config/site.ts` 的 `siteUrl` 为 `https://honghuang.foomansoft.com/`，`astro.config.mjs` 的 `base` 为 `/`。组件中的站内链接使用 `withBase()`；Markdown 正文中的站内链接从根路径开始，例如 `/post/swiftui-notes/`、`/media/example.png`，不再添加 `/blog/`。
+
+中文界面沿用无前缀地址，英文和日文界面分别使用 `/en/` 与 `/ja/` 前缀。页眉中的语言菜单会切换到当前页面的对应语言版本，例如 `/post/swiftui-notes/`、`/en/post/swiftui-notes/` 与 `/ja/post/swiftui-notes/`。每篇文章的不同语言正文是独立 Markdown 文件，通过相同的 `translationKey` 配对；三种界面分别生成对应语言的文章列表、搜索索引与 RSS，并在页面 head 中互相声明 `hreflang`。
 
 GitHub 仓库 Pages 设置中的 Custom domain 应为 `honghuang.foomansoft.com`；Cloudflare DNS 添加名称为 `honghuang`、目标为 `bbc6bae9.github.io` 的 CNAME 记录，代理状态使用“仅 DNS”。此仓库通过 GitHub Actions 部署，域名以 Pages 设置为准，不依赖仓库里的 CNAME 文件。GitHub 签发证书后启用 Enforce HTTPS。
 

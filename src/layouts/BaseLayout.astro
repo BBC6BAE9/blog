@@ -1,6 +1,15 @@
 ---
 import { withBase } from "@/lib/urls";
 import { siteConfig } from "@/config/site";
+import {
+  alternateLocalePath,
+  defaultLocale,
+  getMessages,
+  localeMeta,
+  locales,
+  localizedPath,
+  type Locale,
+} from "@/i18n";
 import "@/styles/global.css";
 
 interface Props {
@@ -12,11 +21,13 @@ interface Props {
   prevUrl?: string;
   nextUrl?: string;
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  locale?: Locale;
 }
 
 const {
+  locale = defaultLocale,
   title = siteConfig.title,
-  description = siteConfig.description,
+  description,
   image = siteConfig.socialImage,
   type = "website",
   noindex = false,
@@ -25,21 +36,29 @@ const {
   structuredData,
 } = Astro.props;
 
+const copy = getMessages(locale);
+const pageDescription = description ?? copy.site.description;
 const canonical = new URL(Astro.url.pathname, siteConfig.siteUrl).toString();
 const absoluteImage = new URL(withBase(image), siteConfig.siteUrl).toString();
 const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.name}`;
+const alternateUrls = locales.map((alternateLocale) => ({
+  locale: alternateLocale,
+  href: new URL(withBase(alternateLocalePath(Astro.url.pathname, alternateLocale)), siteConfig.siteUrl).toString(),
+}));
 const defaultStructuredData = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: siteConfig.name,
-  url: siteConfig.siteUrl,
-  description: siteConfig.description,
+  url: canonical,
+  inLanguage: localeMeta[locale].htmlLang,
+  description: copy.site.description,
   publisher: {
     "@type": "Person",
     name: siteConfig.authorName,
   },
 };
 const schema = structuredData ?? defaultStructuredData;
+const themeLabels = { toLight: copy.theme.toLight, toDark: copy.theme.toDark };
 const fontFaces = [
   ["Geist", "Geist-Variable.woff2"],
   ["Geist Mono", "GeistMono-Variable.woff2"],
@@ -47,33 +66,44 @@ const fontFaces = [
 ---
 
 <!doctype html>
-<html lang={siteConfig.language} data-theme="light">
+<html lang={localeMeta[locale].htmlLang} data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preload" href={withBase("/fonts/geist/Geist-Variable.woff2")} as="font" type="font/woff2" crossorigin />
     <style is:inline set:html={fontFaces} />
     <title>{pageTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={pageDescription} />
     <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
     <link rel="canonical" href={canonical} />
+    {alternateUrls.map((alternate) => (
+      <link rel="alternate" hreflang={localeMeta[alternate.locale].htmlLang} href={alternate.href} />
+    ))}
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL(withBase(alternateLocalePath(Astro.url.pathname, defaultLocale)), siteConfig.siteUrl).toString()}
+    />
     {prevUrl && <link rel="prev" href={new URL(withBase(prevUrl), siteConfig.siteUrl).toString()} />}
     {nextUrl && <link rel="next" href={new URL(withBase(nextUrl), siteConfig.siteUrl).toString()} />}
-    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} RSS`} href={new URL(withBase("/rss.xml"), siteConfig.siteUrl).toString()} />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} RSS`} href={new URL(withBase(localizedPath(locale, "/rss.xml")), siteConfig.siteUrl).toString()} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
-    <meta property="og:locale" content={siteConfig.locale} />
+    <meta property="og:locale" content={localeMeta[locale].ogLocale} />
+    {locales.filter((item) => item !== locale).map((item) => (
+      <meta property="og:locale:alternate" content={localeMeta[item].ogLocale} />
+    ))}
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={siteConfig.name} />
     <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={pageDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={absoluteImage} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={pageDescription} />
     <meta name="twitter:image" content={absoluteImage} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
-    <script is:inline>
+    <script is:inline define:vars={{ themeLabels }}>
       /*
        * Runs before first paint so the stored reading mode is applied without a
        * flash. Falls back to the system preference until the reader picks a side.
@@ -94,7 +124,7 @@ const fontFaces = [
           const isDark = theme === "dark";
           document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
             button.setAttribute("aria-checked", String(isDark));
-            button.setAttribute("aria-label", isDark ? "切换到浅色模式" : "切换到深色模式");
+            button.setAttribute("aria-label", isDark ? themeLabels.toLight : themeLabels.toDark);
           });
         };
 
@@ -135,7 +165,7 @@ const fontFaces = [
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#content">跳转到正文</a>
+    <a class="skip-link" href="#content">{copy.accessibility.skipToContent}</a>
     <slot />
   </body>
 </html>

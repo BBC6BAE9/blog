@@ -1,34 +1,5 @@
 ---
-import { getCollection } from "astro:content";
-import SiteFooter from "@/components/SiteFooter.astro";
-import SiteHeader from "@/components/SiteHeader.astro";
-import BaseLayout from "@/layouts/BaseLayout.astro";
-import { siteConfig } from "@/config/site";
-import { visiblePosts } from "@/lib/posts";
-
-const allPosts = visiblePosts(await getCollection("posts"));
+import ContactPage from "@/views/ContactPage.astro";
 ---
 
-<BaseLayout title="Contact" description="Get in touch with Hong Huang by email, GitHub, or X.">
-  <SiteHeader posts={allPosts} />
-  <main id="content" class="outer" lang="en">
-    <div class="canvas">
-      <header class="pagehead">
-        <p class="eyebrow">Contact</p>
-        <h1 class="pagehead-title">Let’s talk</h1>
-        <p class="pagehead-description">I welcome article corrections, technical discussions, and feedback on open-source projects.</p>
-      </header>
-      <div class="prose">
-        <h2>Email</h2>
-        <p>Email me at <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>. For feedback on an article, please include a link and any relevant details.</p>
-        <h2>GitHub</h2>
-        <p>For questions about an open-source project, please open an issue in the relevant repository so others can join the discussion.</p>
-        <p><a href="https://github.com/BBC6BAE9">github.com/BBC6BAE9</a></p>
-        <h2>X</h2>
-        <p><a href="https://x.com/Bae9Bbc6">@Bae9Bbc6</a></p>
-      </div>
-      <a href={`mailto:${siteConfig.email}`} class="btn btn-solid mt-8">Email me</a>
-    </div>
-  </main>
-  <SiteFooter />
-</BaseLayout>
+<ContactPage locale="zh-CN" />
